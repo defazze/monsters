@@ -1,11 +1,11 @@
 import Phaser from "phaser";
 
 export default class extends Phaser.GameObjects.Container {
-  constructor({ scene, x, y, totalLife }) {
+  constructor({ scene, x, y, health }) {
     super(scene, x, y);
 
     this.lenght = 90;
-    this.totalLife = totalLife;
+    this.health = health;
 
     this.progressBox = this.scene.add.graphics();
     this.progressBar = this.scene.add.graphics();
@@ -20,21 +20,17 @@ export default class extends Phaser.GameObjects.Container {
     this.add([this.progressBox, this.progressBar, this.deathBar]);
   }
 
-  setTotalLife(totalLife) {
-    this.totalLife = totalLife;
-  }
-
-  setCurrentLife(currentLife) {
-    if (currentLife < 0) {
-      currentLife = 0;
+  setHealth(health) {
+    if (health < 0) {
+      health = 0;
     }
 
-    if (currentLife > this.totalLife) {
-      currentLife = this.totalLife;
+    if (health > this.health) {
+      health = this.health;
     }
 
-    const death = this.totalLife - currentLife;
-    const deathLenght = (this.lenght / this.totalLife) * death;
+    const death = this.health - health;
+    const deathLenght = (this.lenght / this.health) * death;
 
     this.deathBar.clear();
     this.deathBar.fillStyle(0xffffff, 1);

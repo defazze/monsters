@@ -1,31 +1,31 @@
 import Phaser from "phaser";
-import LiveBar from "../graphics/LiveBar";
+import HealthBar from "../graphics/HealthBar";
 
 export default class extends Phaser.GameObjects.Container {
-  constructor({ scene, x, y, asset, name, totalLife }) {
+  constructor({ scene, x, y, asset, name, health }) {
     super(scene, x, y);
 
-    this.currentLife = totalLife;
+    this.currentHealth = health;
     this.isDead = false;
 
     this.sprite = scene.add.sprite(48, 64, asset);
-    this.liveBar = new LiveBar({ scene, x: 0, y: 15, totalLife });
-    scene.add.existing(this.liveBar);
+    this.healthBar = new HealthBar({ scene, x: 0, y: 15, health });
+    scene.add.existing(this.healthBar);
     this.name = scene.add.text(16, 0, name, {
       fontFamily: "Arial",
       fontSize: 12,
       color: "#0f0f0f"
     });
 
-    this.add([this.sprite, this.liveBar, this.name]);
+    this.add([this.sprite, this.healthBar, this.name]);
   }
 
   hit(damage) {
-    this.currentLife -= damage;
-    if (this.currentLife <= 0) {
+    this.currentHealth -= damage;
+    if (this.currentHealth <= 0) {
       this.isDead = true;
     }
 
-    this.liveBar.setCurrentLife(this.currentLife);
+    this.healthBar.setHealth(this.currentHealth);
   }
 }

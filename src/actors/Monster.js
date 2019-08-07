@@ -2,11 +2,17 @@ import Phaser from "phaser";
 import Actor from "./Actor";
 
 export class Monster extends Actor {
-  constructor({ scene, x, y, asset, name, totalLife, onClick, onAttack }) {
-    super({ scene, x, y, asset, name, totalLife });
+  constructor({ scene, x, y, onClick, onAttack, health, monsterInfo }) {
+    super({
+      scene,
+      x,
+      y,
+      health,
+      asset: monsterInfo.asset,
+      name: monsterInfo.name
+    });
 
-    this.attackInterval = 500;
-    this.damage = 75;
+    this.monsterInfo = monsterInfo;
     this.lastAttackTime = 0;
     this.onAttack = onAttack;
 
@@ -20,7 +26,10 @@ export class Monster extends Actor {
 
   update(time) {
     if (!this.isDead) {
-      if (time > this.lastAttackTime + this.attackInterval) {
+      if (!this.monsterInfo.attackInterval) {
+        this.monsterInfo.attackInterval = 500;
+      }
+      if (time > this.lastAttackTime + this.monsterInfo.attackInterval) {
         this.lastAttackTime = time;
         this.onAttack(this);
       }
