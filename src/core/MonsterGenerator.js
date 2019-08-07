@@ -1,29 +1,38 @@
 import Phaser from "phaser";
 import Data from "../../data/monsters.json";
+import MonstersCount from "../../data/monstersCount.json";
 import { CELL_SIZE } from "../constants/common";
 
 export default class {
   constructor() {
-    this.monsters = Data;
+    this.monstersInfo = Data;
   }
 
   generate(wave) {
-    const waveMonsters = this.monsters.filter(
+    const enabledMonsters = this.monstersInfo.filter(
       m => m.minWave <= wave && m.maxWave >= wave
     );
+    const enabledMonsterCount = enabledMonsters.length;
 
-    const generatedMonsters = waveMonsters.map(monsterInfo => {
-      const number = waveMonsters.indexOf(monsterInfo) + 1;
+    const minCount = MonstersCount[0].min[wave - 1];
+    const maxCount = MonstersCount[0].max[wave - 1];
+    const count = Phaser.Math.RND.between(minCount, maxCount);
 
-      const coords = this.getCoordinates(number);
+    const generatedMonsters = [];
+    for (var num = 1; num <= count; num++) {
+      const enabledMonsterIndex =
+        Phaser.Math.RND.between(1, enabledMonsterCount) - 1;
 
+      const monsterInfo = enabledMonsters[enabledMonsterIndex];
+
+      const coords = this.getCoordinates(num);
       const health = Phaser.Math.RND.between(
         monsterInfo.minHealth,
         monsterInfo.maxHealth
       );
 
-      return { monsterInfo, coords, health };
-    });
+      generatedMonsters.push({ monsterInfo, coords, health });
+    }
 
     return generatedMonsters;
   }

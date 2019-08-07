@@ -4,8 +4,10 @@ import Phaser from "phaser";
 import Actor from "../actors/Actor";
 import { Monster } from "../actors/Monster";
 import Generator from "../core/MonsterGenerator";
+import Builder from "../core/PlayerBuilder";
 import Calculator from "../core/DamageCalculator";
-import { CELL_SIZE } from "../constants/common";
+import { CELL_SIZE, SPAWN_DELAY } from "../constants/common";
+import { Player } from "../actors/Player";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -16,7 +18,15 @@ export default class extends Phaser.Scene {
   preload() {}
 
   create() {
+    this.spawnTime = 0;
+    this.spawnDelayRun = false;
+
     this.cameras.main.setBackgroundColor(0x8ee5ee);
+
+    this.header = this.add.text(200, 10, "Wave 1", {
+      font: "64px Bangers",
+      fill: "#666666"
+    });
 
     const graphics = this.add.graphics();
     graphics.lineStyle(3, 0x0f0f0f);
@@ -26,44 +36,69 @@ export default class extends Phaser.Scene {
     this.onMonsterClick = this.onMonsterClick.bind(this);
 
     this.generator = new Generator();
-    this.Calculator = new Calculator();
+    this.сalculator = new Calculator();
+    this.builder = new Builder();
 
     this.wave = 1;
+    this.mustSpawn = true;
 
-    this.monstersGenerate();
-
-    this.player = new Actor({
+    this.playerInfo = this.builder.build();
+    this.player = new Player({
       scene: this,
       x: CELL_SIZE * 4,
       y: CELL_SIZE * 4,
-      asset: "pokemon",
-      name: "Player",
-      health: 10
+      playerInfo: this.playerInfo
     });
     this.add.existing(this.player);
   }
 
   update(time, delta) {
-    this.monsters.forEach(m => m.update(time));
-  }
+    if (this.monsters) {
+      this.monsters.forEach(m => m.update(time));
+    }
 
-  onMonsterClick(monster) {
-    monster.hit(1);
-    if (monster.isDead) {
-      monster.destroy();
-      if (this.monsters.every(m => m.isDead)) {
-        if (this.wave == 10) {
-          this.scene.start("GameOverScene");
-        } else {
-          this.wave++;
+    if (this.mustSpawn) {
+      if (!this.spawnDelayRun) {
+        this.spawnDelayRun = true;
+        this.spawnTime = time + SPAWN_DELAY;
+      } else {
+        if (time >= this.spawnTime) {
+          this.mustSpawn = false;
+          this.spawnDelayRun = false;
           this.monstersGenerate();
         }
       }
     }
   }
 
+  onMonsterClick(monster) {
+    const damage = this.сalculator.toMonster(
+      this.playerInfo,
+      monster.monsterInfo
+    );
+    monster.hit(damage);
+    if (monster.isDead) {
+      monster.destroy();
+    }
+
+    if (this.monsters.every(m => m.isDead)) {
+      this.wave++;
+      if (this.wave > 10) {
+        this.scene.start("GameOverScene");
+      } else {
+        this.mustSpawn = true;
+
+        this.header.destroy();
+        this.header = this.add.text(200, 10, "Wave " + this.wave, {
+          font: "64px Bangers",
+          fill: "#666666"
+        });
+      }
+    }
+  }
+
   onMosterAttack(monsterInfo) {
-    const damage = this.Calculator.toPlayer(monsterInfo);
+    const damage = this.сalculator.toPlayer(monsterInfo, this.playerInfo);
     this.player.hit(damage);
     if (this.player.currentHealth <= 0) {
       this.scene.start("GameOverScene");
