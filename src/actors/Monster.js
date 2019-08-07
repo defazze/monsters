@@ -16,10 +16,11 @@ export class Monster extends Actor {
     this.lastAttackTime = 0;
     this.onAttack = onAttack;
 
-    this.setInteractive(
-      new Phaser.Geom.Rectangle(0, 0, 96, 96),
-      Phaser.Geom.Rectangle.Contains
-    );
+    this.setInteractive({
+      hitArea: new Phaser.Geom.Rectangle(0, 0, 96, 96),
+      hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+      cursor: "url(assets/cursors/sword.cur), pointer"
+    });
 
     this.on("pointerdown", () => onClick(this));
   }
