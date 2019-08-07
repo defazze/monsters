@@ -3,6 +3,7 @@ import Phaser from "phaser";
 
 import Actor from "../actors/Actor";
 import { Monster } from "../actors/Monster";
+import Data from "../../data/monsters.json";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -13,20 +14,29 @@ export default class extends Phaser.Scene {
 
   create() {
     this.currentLife = 1000;
-    this.cameras.main.setBackgroundColor(0xf0f8ff);
+    this.cameras.main.setBackgroundColor(0x8ee5ee);
 
-    const monster = new Monster({
+    const graphics = this.add.graphics();
+    graphics.lineStyle(3, 0x0f0f0f);
+    graphics.strokeRect(96, 96, 864, 672);
+
+    this.onMosterAttack = this.onMosterAttack.bind(this);
+
+    console.log(Data);
+
+    this.monster = new Monster({
       scene: this,
       x: 550,
       y: 300,
       asset: "mushroom",
       name: "Mushroom",
       totalLife: 1000,
-      onClick: this.onClick
+      onClick: this.onMonsterClick,
+      onAttack: this.onMosterAttack
     });
-    this.add.existing(monster);
+    this.add.existing(this.monster);
 
-    const player = new Actor({
+    this.player = new Actor({
       scene: this,
       x: 150,
       y: 300,
@@ -34,12 +44,24 @@ export default class extends Phaser.Scene {
       name: "Player",
       totalLife: 1000
     });
-    this.add.existing(player);
+    this.add.existing(this.player);
   }
 
-  update() {}
+  update(time, delta) {
+    this.monster.update(time);
+  }
 
-  onClick(monster) {
+  onMonsterClick(monster) {
     monster.hit(66);
+    if (monster.isDead) {
+      monster.destroy();
+    }
+  }
+
+  onMosterAttack(monster) {
+    this.player.hit(monster.damage);
+    if (this.player.currentLife <= 0) {
+      this.scene.start("GameOverScene");
+    }
   }
 }

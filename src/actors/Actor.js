@@ -6,6 +6,7 @@ export default class extends Phaser.GameObjects.Container {
     super(scene, x, y);
 
     this.currentLife = totalLife;
+    this.isDead = false;
 
     this.sprite = scene.add.sprite(48, 64, asset);
     this.liveBar = new LiveBar({ scene, x: 0, y: 15, totalLife });
@@ -21,6 +22,10 @@ export default class extends Phaser.GameObjects.Container {
 
   hit(damage) {
     this.currentLife -= damage;
+    if (this.currentLife <= 0) {
+      this.isDead = true;
+    }
+
     this.liveBar.setCurrentLife(this.currentLife);
   }
 }

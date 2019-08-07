@@ -1,0 +1,11 @@
+{
+  "name": "Mushroom",
+  "asset": "mushroom2",
+  "zone": "Tutorial",
+  "minWave": 1,
+  "maxWave": 10,
+  "minHealth": 7,
+  "maxHealth": 12,
+  "minDamage": 1,
+  "maxDamage": 3
+}
