@@ -25,6 +25,7 @@ export default class extends Phaser.Scene {
     graphics.strokeRect(CELL_SIZE, CELL_SIZE, CELL_SIZE * 9, CELL_SIZE * 7);
 
     this.onMosterAttack = this.onMosterAttack.bind(this);
+    this.onMonsterClick = this.onMonsterClick.bind(this);
 
     this.generator = new Generator();
     this.wave = 1;
@@ -50,6 +51,14 @@ export default class extends Phaser.Scene {
     monster.hit(1);
     if (monster.isDead) {
       monster.destroy();
+      if (this.monsters.every(m => m.isDead)) {
+        if (this.wave == 10) {
+          this.scene.start("GameOverScene");
+        } else {
+          this.wave++;
+          this.monstersGenerate();
+        }
+      }
     }
   }
 
