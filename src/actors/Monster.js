@@ -31,7 +31,7 @@ export class Monster extends Actor {
       }
       if (time > this.lastAttackTime + this.monsterInfo.attackInterval) {
         this.lastAttackTime = time;
-        this.onAttack(this);
+        this.onAttack(this.monsterInfo);
       }
     }
   }

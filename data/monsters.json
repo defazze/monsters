@@ -9,6 +9,6 @@
     "maxHealth": 12,
     "minDamage": 1,
     "maxDamage": 3,
-    "attackInterval": 500
+    "attackInterval": 750
   }
 ]

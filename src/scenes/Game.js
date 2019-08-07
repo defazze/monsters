@@ -4,7 +4,7 @@ import Phaser from "phaser";
 import Actor from "../actors/Actor";
 import { Monster } from "../actors/Monster";
 import Generator from "../core/MonsterGenerator";
-
+import Calculator from "../core/DamageCalculator";
 import { CELL_SIZE } from "../constants/common";
 
 export default class extends Phaser.Scene {
@@ -16,8 +16,6 @@ export default class extends Phaser.Scene {
   preload() {}
 
   create() {
-    this.health = 1000;
-
     this.cameras.main.setBackgroundColor(0x8ee5ee);
 
     const graphics = this.add.graphics();
@@ -28,6 +26,8 @@ export default class extends Phaser.Scene {
     this.onMonsterClick = this.onMonsterClick.bind(this);
 
     this.generator = new Generator();
+    this.Calculator = new Calculator();
+
     this.wave = 1;
 
     this.monstersGenerate();
@@ -38,7 +38,7 @@ export default class extends Phaser.Scene {
       y: CELL_SIZE * 4,
       asset: "pokemon",
       name: "Player",
-      health: 1000
+      health: 10
     });
     this.add.existing(this.player);
   }
@@ -62,8 +62,9 @@ export default class extends Phaser.Scene {
     }
   }
 
-  onMosterAttack(monster) {
-    this.player.hit(monster.damage);
+  onMosterAttack(monsterInfo) {
+    const damage = this.Calculator.toPlayer(monsterInfo);
+    this.player.hit(damage);
     if (this.player.currentHealth <= 0) {
       this.scene.start("GameOverScene");
     }
