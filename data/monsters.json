@@ -28,5 +28,20 @@
     "defence": 5,
     "block": 3,
     "attackInterval": 750
+  },
+  {
+    "name": "Hedgehog",
+    "asset": "hedgehog",
+    "zone": "Tutorial",
+    "minWave": 4,
+    "maxWave": 10,
+    "minHealth": 7,
+    "maxHealth": 12,
+    "minDamage": 2,
+    "maxDamage": 3,
+    "attackRating": 8,
+    "defence": 5,
+    "block": 3,
+    "attackInterval": 750
   }
 ]
