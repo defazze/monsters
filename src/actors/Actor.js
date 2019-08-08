@@ -5,7 +5,6 @@ export default class extends Phaser.GameObjects.Container {
   constructor({ scene, x, y, asset, name, health }) {
     super(scene, x, y);
 
-    this.lastUpdateTime = 0;
     this.regenerates = [];
     this.currentRegenerate = null;
     this.regenerateSpeed = 0;
@@ -40,11 +39,7 @@ export default class extends Phaser.GameObjects.Container {
     this.regenerates.push({ health, interval });
   }
 
-  update(time) {
-    if (this.lastUpdateTime == 0) {
-      this.lastUpdateTime = time;
-    }
-
+  update(time, delta) {
     if (this.regenerates.length > 0 && !this.currentRegenerate) {
       this.currentRegenerate = this.regenerates.shift();
       this.regenerateSpeed =
@@ -58,8 +53,7 @@ export default class extends Phaser.GameObjects.Container {
         this.timeRegenerat = 0;
         this.regenerateSpeed = 0;
       } else {
-        this.currentHealth +=
-          this.regenerateSpeed * (time - this.lastUpdateTime);
+        this.currentHealth += this.regenerateSpeed * delta;
 
         if (this.currentHealth >= this.totalHealth) {
           this.regenerates = [];
@@ -70,7 +64,5 @@ export default class extends Phaser.GameObjects.Container {
         this.healthBar.setHealth(this.currentHealth);
       }
     }
-
-    this.lastUpdateTime = time;
   }
 }

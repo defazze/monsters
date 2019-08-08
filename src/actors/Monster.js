@@ -25,8 +25,8 @@ export class Monster extends Actor {
     this.on("pointerdown", () => onClick(this));
   }
 
-  update(time) {
-    super.update(time);
+  update(time, delta) {
+    super.update(time, delta);
 
     if (!this.isDead) {
       if (!this.monsterInfo.attackInterval) {

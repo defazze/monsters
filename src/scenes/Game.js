@@ -78,7 +78,7 @@ export default class extends Phaser.Scene {
       }
     }
 
-    this.player.update(time);
+    this.player.update(time, delta);
   }
 
   onMonsterClick = monster => {
