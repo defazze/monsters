@@ -8,7 +8,7 @@ export class Player extends Actor {
       x,
       y,
       health: playerInfo.health,
-      asset: "pokemon",
+      asset: "hero",
       name: "Hero"
     });
 

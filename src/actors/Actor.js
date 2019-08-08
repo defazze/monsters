@@ -5,6 +5,12 @@ export default class extends Phaser.GameObjects.Container {
   constructor({ scene, x, y, asset, name, health }) {
     super(scene, x, y);
 
+    this.regenerates = [];
+    this.currentRegenerate = null;
+    this.regenerateSpeed = 0;
+    this.timeRegenerate = 0;
+
+    this.totalHealth = health;
     this.currentHealth = health;
     this.isDead = false;
 
@@ -27,5 +33,36 @@ export default class extends Phaser.GameObjects.Container {
     }
 
     this.healthBar.setHealth(this.currentHealth);
+  }
+
+  regenerate(health, interval) {
+    this.regenerates.push({ health, interval });
+  }
+
+  update(time, delta) {
+    if (this.regenerates.length > 0 && !this.currentRegenerate) {
+      this.currentRegenerate = this.regenerates.shift();
+      this.regenerateSpeed =
+        this.currentRegenerate.health / this.currentRegenerate.interval;
+      this.timeRegenerate = time + this.currentRegenerate.interval;
+    }
+
+    if (this.currentRegenerate) {
+      if (time >= this.timeRegenerate) {
+        this.currentRegenerate = null;
+        this.timeRegenerat = 0;
+        this.regenerateSpeed = 0;
+      } else {
+        this.currentHealth += this.regenerateSpeed * delta;
+
+        if (this.currentHealth >= this.totalHealth) {
+          this.regenerates = [];
+          this.currentRegenerate = null;
+          this.currentHealth = this.totalHealth;
+        }
+
+        this.healthBar.setHealth(this.currentHealth);
+      }
+    }
   }
 }
