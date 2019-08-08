@@ -8,6 +8,7 @@ import Builder from "../core/PlayerBuilder";
 import Calculator from "../core/DamageCalculator";
 import { CELL_SIZE, SPAWN_DELAY } from "../constants/common";
 import { Player } from "../actors/Player";
+import Potion from "../sprites/HpPotion";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -28,12 +29,11 @@ export default class extends Phaser.Scene {
       fill: "#666666"
     });
 
+    this.input.keyboard.on("keydown", this.onKeyPressed);
+
     const graphics = this.add.graphics();
     graphics.lineStyle(3, 0x0f0f0f);
     graphics.strokeRect(CELL_SIZE, CELL_SIZE, CELL_SIZE * 9, CELL_SIZE * 7);
-
-    this.onMosterAttack = this.onMosterAttack.bind(this);
-    this.onMonsterClick = this.onMonsterClick.bind(this);
 
     this.generator = new Generator();
     this.сalculator = new Calculator();
@@ -50,6 +50,14 @@ export default class extends Phaser.Scene {
       playerInfo: this.playerInfo
     });
     this.add.existing(this.player);
+
+    const potion = new Potion({
+      scene: this,
+      x: CELL_SIZE * 1.5,
+      y: CELL_SIZE * 8.5,
+      onClick: this.onPotionClick
+    });
+    this.add.existing(potion);
   }
 
   update(time, delta) {
@@ -69,9 +77,11 @@ export default class extends Phaser.Scene {
         }
       }
     }
+
+    this.player.update(time);
   }
 
-  onMonsterClick(monster) {
+  onMonsterClick = monster => {
     const damage = this.сalculator.toMonster(
       this.playerInfo,
       monster.monsterInfo
@@ -95,16 +105,25 @@ export default class extends Phaser.Scene {
         });
       }
     }
-  }
+  };
 
-  onMosterAttack(monsterInfo) {
+  onMosterAttack = monsterInfo => {
     const damage = this.сalculator.toPlayer(monsterInfo, this.playerInfo);
     this.player.hit(damage);
     if (this.player.currentHealth <= 0) {
       this.scene.start("GameOverScene");
     }
-  }
+  };
 
+  onPotionClick = () => {
+    this.player.regenerate(10, 2000);
+  };
+
+  onKeyPressed = event => {
+    if (event.key == "1") {
+      this.player.regenerate(10, 2000);
+    }
+  };
   monstersGenerate() {
     const generatedMonsters = this.generator.generate(this.wave);
 

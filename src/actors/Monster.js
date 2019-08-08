@@ -26,6 +26,8 @@ export class Monster extends Actor {
   }
 
   update(time) {
+    super.update(time);
+
     if (!this.isDead) {
       if (!this.monsterInfo.attackInterval) {
         this.monsterInfo.attackInterval = 500;
