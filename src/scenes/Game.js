@@ -24,8 +24,16 @@ export default class extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor(0x8ee5ee);
 
+    this.anims.create({
+      key: "flip",
+      frames: this.anims.generateFrameNumbers("coin"),
+      frameRate: 20,
+      repeat: 1,
+      hideOnComplete: true
+    });
+
     const castle = this.add.sprite(150, 50, "castle").setInteractive();
-    castle.on("pointerdown", () => this.scene.start("CastleScene"));
+    castle.on("pointerdown", () => this.scene.switch("CastleScene"));
 
     this.header = this.add.text(400, 10, "Wave 1", {
       font: "64px Bangers",
@@ -92,6 +100,17 @@ export default class extends Phaser.Scene {
     monster.hit(damage);
     if (monster.isDead) {
       monster.destroy();
+
+      const coin = this.add.sprite(
+        monster.x + CELL_SIZE / 2,
+        monster.y + CELL_SIZE / 2,
+        "coin"
+      );
+      coin.anims.play("flip");
+      coin.once("animationcomplete", () => {
+        console.log("destroy coin");
+        coin.destroy();
+      });
     }
 
     if (this.monsters.every(m => m.isDead)) {

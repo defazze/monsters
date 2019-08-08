@@ -17,6 +17,10 @@ export default class extends Phaser.Scene {
     this.load.image("castle", "assets/images/castle.png");
     this.load.image("castle-big", "assets/images/castle-big.png");
     this.load.image("battlefield", "assets/images/battlefield.png");
+    this.load.spritesheet("coin", "assets/images/coin.png", {
+      frameWidth: 16,
+      frameHeight: 16
+    });
   }
 
   create() {

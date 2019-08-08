@@ -13,7 +13,7 @@ export default class extends Phaser.Scene {
     const battlefield = this.add
       .sprite(150, 50, "battlefield")
       .setInteractive();
-    battlefield.on("pointerdown", () => this.scene.start("GameScene"));
+    battlefield.on("pointerdown", () => this.scene.switch("GameScene"));
 
     this.add.sprite(528, 432, "castle-big");
   }
