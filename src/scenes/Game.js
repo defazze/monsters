@@ -24,7 +24,10 @@ export default class extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor(0x8ee5ee);
 
-    this.header = this.add.text(200, 10, "Wave 1", {
+    const castle = this.add.sprite(150, 50, "castle").setInteractive();
+    castle.on("pointerdown", () => this.scene.start("CastleScene"));
+
+    this.header = this.add.text(400, 10, "Wave 1", {
       font: "64px Bangers",
       fill: "#666666"
     });
@@ -99,7 +102,7 @@ export default class extends Phaser.Scene {
         this.mustSpawn = true;
 
         this.header.destroy();
-        this.header = this.add.text(200, 10, "Wave " + this.wave, {
+        this.header = this.add.text(400, 10, "Wave " + this.wave, {
           font: "64px Bangers",
           fill: "#666666"
         });
@@ -124,6 +127,7 @@ export default class extends Phaser.Scene {
       this.player.regenerate(10, 2000);
     }
   };
+
   monstersGenerate() {
     const generatedMonsters = this.generator.generate(this.wave);
 
