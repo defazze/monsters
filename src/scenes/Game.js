@@ -9,6 +9,7 @@ import Calculator from "../core/DamageCalculator";
 import { CELL_SIZE, SPAWN_DELAY } from "../constants/common";
 import { Player } from "../actors/Player";
 import Potion from "../sprites/HpPotion";
+import Battlefield from "../core/FieldController.js";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -35,10 +36,7 @@ export default class extends Phaser.Scene {
     const castle = this.add.sprite(150, 50, "castle").setInteractive();
     castle.on("pointerdown", () => this.scene.switch("CastleScene"));
 
-    this.header = this.add.text(400, 10, "Wave 1", {
-      font: "64px Bangers",
-      fill: "#666666"
-    });
+    this.setHeader(1);
 
     this.input.keyboard.on("keydown", this.onKeyPressed);
 
@@ -108,7 +106,6 @@ export default class extends Phaser.Scene {
       );
       coin.anims.play("flip");
       coin.once("animationcomplete", () => {
-        console.log("destroy coin");
         coin.destroy();
       });
     }
@@ -120,11 +117,7 @@ export default class extends Phaser.Scene {
       } else {
         this.mustSpawn = true;
 
-        this.header.destroy();
-        this.header = this.add.text(400, 10, "Wave " + this.wave, {
-          font: "64px Bangers",
-          fill: "#666666"
-        });
+        this.setHeader(this.wave);
       }
     }
   };
@@ -146,6 +139,17 @@ export default class extends Phaser.Scene {
       this.player.regenerate(10, 2000);
     }
   };
+
+  setHeader(wave) {
+    if (this.header) {
+      this.header.destroy();
+    }
+
+    this.header = this.add.text(400, 10, "Wave " + wave, {
+      font: "64px Bangers",
+      fill: "#666666"
+    });
+  }
 
   monstersGenerate() {
     const generatedMonsters = this.generator.generate(this.wave);
