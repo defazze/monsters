@@ -3,7 +3,7 @@ import HealthBar from "../graphics/HealthBar";
 import Regenerator from "../core/Regenerator";
 
 export default class extends Phaser.GameObjects.Container {
-  constructor({ scene, x, y, asset, name, health }) {
+  constructor({ scene, x, y, asset, name, health, onDead }) {
     super(scene, x, y);
 
     this.regenerator = new Regenerator();
@@ -11,6 +11,8 @@ export default class extends Phaser.GameObjects.Container {
     this.totalHealth = health;
     this.currentHealth = health;
     this.isDead = false;
+
+    this.onDead = onDead;
 
     this.sprite = scene.add.sprite(48, 64, asset);
     this.healthBar = new HealthBar({ scene, x: 0, y: 15, health });
@@ -28,6 +30,7 @@ export default class extends Phaser.GameObjects.Container {
     this.currentHealth -= damage;
     if (this.currentHealth <= 0) {
       this.isDead = true;
+      this.onDead(this);
     }
 
     this.healthBar.setHealth(this.currentHealth);

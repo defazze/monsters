@@ -106,7 +106,7 @@ export default class {
     if (priorityLines.length == 0) {
       return -1;
     }
-    const p = 75;
+    const p = 70;
 
     for (var i = 0; i < priorityLines.length; i++) {
       const chance = Phaser.Math.RND.between(1, 100);

@@ -92,46 +92,35 @@ export default class extends Phaser.Scene {
   }
 
   onMonsterClick = monster => {
-    const damage = this.сalculator.toMonster(
-      this.playerInfo,
-      monster.monsterInfo
-    );
+    const { monsterInfo } = monster;
+    const damage = this.сalculator.toMonster(this.playerInfo, monsterInfo);
     monster.hit(damage);
     if (monster.isDead) {
-      monster.destroy();
-      this.battlefield.removeMonster(
-        monster.monsterInfo.lineIndex,
-        monster.monsterInfo.rowIndex
+    }
+  };
+
+  onMonsterDead = monster => {
+    const { monsterInfo } = monster;
+
+    monster.destroy();
+    this.battlefield.removeMonster(monsterInfo.lineIndex, monsterInfo.rowIndex);
+
+    this.coinAnimate(monster);
+
+    if (this.battlefield.isEmpty(monsterInfo.lineIndex)) {
+      const monsters = this.monsters.filter(
+        m => m.monsterInfo.lineIndex > monsterInfo.lineIndex && !m.isDead
       );
 
-      const coin = this.add.sprite(
-        monster.x + CELL_SIZE / 2,
-        monster.y + CELL_SIZE / 2,
-        "coin"
-      );
-      coin.anims.play("flip");
-      coin.once("animationcomplete", () => {
-        coin.destroy();
-      });
-
-      if (this.battlefield.isEmpty(monster.monsterInfo.lineIndex)) {
-        console.log(this.monsters);
-        const monsters = this.monsters.filter(
-          m =>
-            m.monsterInfo.lineIndex > monster.monsterInfo.lineIndex && !m.isDead
-        );
-        console.log(monsters);
-        monsters.forEach(m => m.moveForward());
-      }
+      monsters.forEach(m => m.moveForward());
     }
 
-    if (this.monsters.every(m => m.isDead)) {
+    if (this.monsters.every(m => m.isDead || m.monsterInfo.isPermanent)) {
       this.wave++;
       if (this.wave > 10) {
         this.scene.start("GameOverScene");
       } else {
         this.mustSpawn = true;
-
         this.setHeader(this.wave);
       }
     }
@@ -177,12 +166,33 @@ export default class extends Phaser.Scene {
         monsterInfo: monsterInfo,
         health: monsterInfo.health,
         onClick: this.onMonsterClick,
-        onAttack: this.onMosterAttack
+        onAttack: this.onMosterAttack,
+        onDead: this.onMonsterDead
       });
 
       this.add.existing(monster);
 
       return monster;
+    });
+  }
+
+  coinAnimate(monster) {
+    const coin = this.add.sprite(
+      monster.x + CELL_SIZE / 2,
+      monster.y + CELL_SIZE / 2,
+      "coin"
+    );
+    coin.anims.play("flip");
+    coin.once("animationcomplete", () => {
+      coin.destroy();
+    });
+
+    this.tweens.add({
+      targets: coin,
+      y: monster.y + CELL_SIZE / 2 - 30,
+      alpha: 0,
+      ease: "Sine.easeInOut",
+      duration: 500
     });
   }
 }
