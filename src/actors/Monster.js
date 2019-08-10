@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import Actor from "./Actor";
+import { CELL_SIZE } from "../constants/common";
 
 export class Monster extends Actor {
   constructor({ scene, x, y, onClick, onAttack, health, monsterInfo }) {
@@ -12,6 +13,7 @@ export class Monster extends Actor {
       name: monsterInfo.name
     });
 
+    this.scene = scene;
     this.monsterInfo = monsterInfo;
     this.lastAttackTime = 0;
     this.onAttack = onAttack;
@@ -41,5 +43,14 @@ export class Monster extends Actor {
         this.onAttack(this.monsterInfo);
       }
     }
+  }
+
+  moveForward() {
+    this.scene.tweens.add({
+      targets: this,
+      x: this.x - CELL_SIZE,
+      ease: "Sine.easeInOut",
+      duration: 1000
+    });
   }
 }

@@ -58,6 +58,7 @@
     "defence": 0,
     "block": 0,
     "attackInterval": 750,
-    "isPermanent": true
+    "isPermanent": true,
+    "isUnique": true
   }
 ]

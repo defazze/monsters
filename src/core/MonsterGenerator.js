@@ -4,7 +4,8 @@ import MonstersCount from "../../data/monstersCount.json";
 import { CELL_SIZE } from "../constants/common";
 
 export default class {
-  constructor() {
+  constructor(battlefield) {
+    this.battlefield = battlefield;
     this.monstersInfo = Data;
   }
 
@@ -19,19 +20,24 @@ export default class {
     const count = Phaser.Math.RND.between(minCount, maxCount);
 
     const generatedMonsters = [];
+
     for (var num = 1; num <= count; num++) {
       const enabledMonsterIndex =
         Phaser.Math.RND.between(1, enabledMonsterCount) - 1;
 
-      const monsterInfo = enabledMonsters[enabledMonsterIndex];
+      const monsterInfo = { ...enabledMonsters[enabledMonsterIndex] };
 
-      const coords = this.getCoordinates(num);
+      const coords = this.battlefield.setMonster(monsterInfo);
+
       const health = Phaser.Math.RND.between(
         monsterInfo.minHealth,
         monsterInfo.maxHealth
       );
 
-      generatedMonsters.push({ monsterInfo, coords, health });
+      monsterInfo.coords = coords;
+      monsterInfo.health = health;
+
+      generatedMonsters.push(monsterInfo);
     }
 
     return generatedMonsters;

@@ -44,7 +44,8 @@ export default class extends Phaser.Scene {
     graphics.lineStyle(3, 0x0f0f0f);
     graphics.strokeRect(CELL_SIZE, CELL_SIZE, CELL_SIZE * 9, CELL_SIZE * 7);
 
-    this.generator = new Generator();
+    this.battlefield = new Battlefield();
+    this.generator = new Generator(this.battlefield);
     this.сalculator = new Calculator();
     this.builder = new Builder();
 
@@ -98,6 +99,10 @@ export default class extends Phaser.Scene {
     monster.hit(damage);
     if (monster.isDead) {
       monster.destroy();
+      this.battlefield.removeMonster(
+        monster.monsterInfo.lineIndex,
+        monster.monsterInfo.rowIndex
+      );
 
       const coin = this.add.sprite(
         monster.x + CELL_SIZE / 2,
@@ -108,6 +113,16 @@ export default class extends Phaser.Scene {
       coin.once("animationcomplete", () => {
         coin.destroy();
       });
+
+      if (this.battlefield.isEmpty(monster.monsterInfo.lineIndex)) {
+        console.log(this.monsters);
+        const monsters = this.monsters.filter(
+          m =>
+            m.monsterInfo.lineIndex > monster.monsterInfo.lineIndex && !m.isDead
+        );
+        console.log(monsters);
+        monsters.forEach(m => m.moveForward());
+      }
     }
 
     if (this.monsters.every(m => m.isDead)) {
@@ -152,15 +167,15 @@ export default class extends Phaser.Scene {
   }
 
   monstersGenerate() {
-    const generatedMonsters = this.generator.generate(this.wave);
+    const monstersInfo = this.generator.generate(this.wave);
 
-    this.monsters = generatedMonsters.map(generatedMonster => {
+    this.monsters = monstersInfo.map(monsterInfo => {
       const monster = new Monster({
         scene: this,
-        x: generatedMonster.coords.x,
-        y: generatedMonster.coords.y,
-        monsterInfo: generatedMonster.monsterInfo,
-        health: generatedMonster.health,
+        x: monsterInfo.coords.x,
+        y: monsterInfo.coords.y,
+        monsterInfo: monsterInfo,
+        health: monsterInfo.health,
         onClick: this.onMonsterClick,
         onAttack: this.onMosterAttack
       });

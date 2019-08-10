@@ -1,4 +1,4 @@
-import { Z_FILTERED } from "zlib";
+import { CELL_SIZE } from "../constants/common";
 
 import Phaser from "phaser";
 
@@ -23,18 +23,31 @@ export default class {
       [null, null, null, null, null, null, null]
     ];
 
-    this.linesStatus = new Map(
+    this.linesStatus = new Map([
       [4, NORMAL],
       [5, NORMAL],
       [6, NORMAL],
       [7, NORMAL]
-    );
+    ]);
+  }
 
-    this.enableLines = [];
+  debugField() {
+    const copy = [
+      Array.from(this.lines[0]),
+      Array.from(this.lines[1]),
+      Array.from(this.lines[2]),
+      Array.from(this.lines[3]),
+      Array.from(this.lines[4]),
+      Array.from(this.lines[5]),
+      Array.from(this.lines[6]),
+      Array.from(this.lines[7])
+    ];
+    console.log(copy);
   }
 
   setLinesStatus() {
-    for (lineIndex = 4; lineIndex++; lineIndex <= 7) {
+    const enableLines = [];
+    for (var lineIndex = 4; lineIndex <= 7; lineIndex++) {
       const isFull = this.isFull(lineIndex);
       const isEmpty = this.isEmpty(lineIndex);
 
@@ -43,60 +56,78 @@ export default class {
 
       if (
         status == NORMAL ||
-        (status == EMPTY && !this.enableLines.some(EMPTY))
+        (status == EMPTY &&
+          !enableLines.some(a => this.linesStatus.get(a) == EMPTY))
       ) {
-        this.enableLines.push(lineIndex);
+        enableLines.push(lineIndex);
       }
     }
+
+    return enableLines;
   }
 
-  setMonster(monster) {
-    let priorityLines = monster.monsterInfo.priorityLines
-      ? monster.monsterInfo.priorityLines
-      : [1, 2, 3, 4];
+  removeMonster(lineIndex, rowIndex) {
+    this.lines[lineIndex][rowIndex] = null;
+  }
 
-    priorityLines = priorityLines.filter(l => this.enabledLines.some(l));
+  setMonster(monsterInfo) {
+    const enableLines = this.setLinesStatus();
+    let priorityLines = monsterInfo.priorityLines
+      ? monsterInfo.priorityLines
+      : [4, 5, 6, 7];
 
-    let monsterLineIndex = getLineByPriority(priorityLines);
-
+    priorityLines = priorityLines.filter(l => enableLines.some(a => a == l));
+    let monsterLineIndex = this.getLineByPriority(priorityLines);
     if (monsterLineIndex == -1) {
-      monsterLineIndex = getLineByRandom(this.enabledLines);
+      monsterLineIndex = Phaser.Utils.Array.GetRandom(enableLines);
     }
+
+    let monsterRowIndex = 0;
+    if (monsterLineIndex == 4 && this.isEmpty(4)) {
+      monsterRowIndex = 3;
+    } else {
+      monsterRowIndex = Phaser.Utils.Array.GetRandom(
+        [0, 1, 2, 3, 4, 5, 6].filter(a => !this.lines[monsterLineIndex][a])
+      );
+    }
+
+    this.lines[monsterLineIndex][monsterRowIndex] = monsterInfo;
+
+    monsterInfo.lineIndex = monsterLineIndex;
+    monsterInfo.rowIndex = monsterRowIndex;
+
+    return {
+      x: (monsterLineIndex + 2) * CELL_SIZE,
+      y: (monsterRowIndex + 1) * CELL_SIZE
+    };
   }
 
   getLineByPriority(priorityLines) {
-    if (priorityLines.lenght == 0) {
+    if (priorityLines.length == 0) {
       return -1;
     }
-
     const p = 75;
-    let i = 0;
-    for (i = 0; i++; i < priorityLines.lenght) {
+
+    for (var i = 0; i < priorityLines.length; i++) {
       const chance = Phaser.Math.RND.between(1, 100);
       if (chance <= p) {
         return priorityLines[i];
       }
     }
 
-    return priorityLines[i];
-  }
-
-  getLineByRandom(lines) {
-    const line = Phaser.Math.RND.between(0, lines.lenght - 1);
-
-    return line;
+    return priorityLines[priorityLines.length - 1];
   }
 
   isEmpty(lineIndex) {
-    return this.lines[lineIndex].every(cell => !cell);
+    const result = this.lines[lineIndex].every(cell => !cell);
+
+    if (lineIndex == 4) {
+    }
+    return result;
   }
 
   isFull(lineIndex) {
     return this.lines[lineIndex].every(cell => cell);
-  }
-
-  setMain(monster) {
-    this.lines[4][3] = monster;
   }
 
   get mainCell() {

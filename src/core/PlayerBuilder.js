@@ -1,5 +1,5 @@
-import Phaser from "phaser";
 import Data from "../../data/player.json";
+import { SUPERHERO } from "../constants/cheats";
 
 export default class {
   constructor() {
@@ -7,6 +7,11 @@ export default class {
   }
 
   build() {
+    if (SUPERHERO) {
+      this.playerInfo.health = 10000;
+      this.playerInfo.baseMinDamage = 1000;
+      this.playerInfo.baseMaxDamage = 1000;
+    }
     return this.playerInfo;
   }
 }
