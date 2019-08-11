@@ -36,6 +36,11 @@ export default class extends Phaser.Scene {
     const castle = this.add.sprite(150, 50, "castle").setInteractive();
     castle.on("pointerdown", () => this.scene.switch("CastleScene"));
 
+    const inventory = this.add
+      .sprite(229, 50, "inventory-icon")
+      .setInteractive();
+    inventory.on("pointerdown", () => this.scene.switch("InventoryScene"));
+
     this.setHeader(1);
 
     this.input.keyboard.on("keydown", this.onKeyPressed);

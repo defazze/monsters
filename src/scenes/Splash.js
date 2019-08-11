@@ -21,6 +21,8 @@ export default class extends Phaser.Scene {
     this.load.image("castle", "assets/images/castle.png");
     this.load.image("castle-big", "assets/images/castle-big.png");
     this.load.image("battlefield", "assets/images/battlefield.png");
+    this.load.image("inventory", "assets/images/inventory.jpg");
+    this.load.image("inventory-icon", "assets/images/inventory-icon.png");
     this.load.spritesheet("coin", "assets/images/coin.png", {
       frameWidth: 16,
       frameHeight: 16

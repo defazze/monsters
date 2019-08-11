@@ -53,9 +53,11 @@ export class Monster extends Actor {
       if (this.lastAttackTime == 0) {
         this.lastAttackTime = time + this.monsterInfo.attackInterval/2;
       }*/
-
+      const lineDistance = Math.abs(
+        this.monsterInfo.lineIndex - this.player.playerInfo.lineIndex
+      );
       if (time > this.lastAttackTime + this.monsterInfo.attackInterval) {
-        if (this.monsterInfo.isRanged) {
+        if (this.monsterInfo.isRanged && lineDistance > 1) {
           const start = {
             x: this.x,
             y: this.y + CELL_SIZE / 2
@@ -88,10 +90,7 @@ export class Monster extends Actor {
             targets: arrow,
             x: end.x,
             y: end.y,
-            duration:
-              distance /
-              speed /*,
-            onComplete: () => arrow.destroy()*/
+            duration: distance / speed
           });
 
           this.scene.physics.add.overlap(
@@ -101,9 +100,10 @@ export class Monster extends Actor {
             null,
             this
           );
+        } else {
+          this.onAttack(this);
         }
         this.lastAttackTime = time;
-        this.onAttack(this);
       }
     }
   }
@@ -131,6 +131,7 @@ export class Monster extends Actor {
   }
 
   onRangeHit = (player, arrow) => {
+    this.onAttack(this);
     arrow.destroy();
   };
 }

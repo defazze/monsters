@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { FIRST_MONSTER_LINE } from "../constants/common";
 
 export default class {
   constructor() {}
@@ -15,6 +16,23 @@ export default class {
     const chance = Phaser.Math.RND.between(1, 100);
     if (chance > chanceToHit) {
       damage = 0;
+    } else {
+      const lineDistance = Math.abs(
+        monsterInfo.lineIndex - playerInfo.lineIndex
+      );
+      if (monsterInfo.isRanged) {
+        if (lineDistance == 1) {
+          damage = damage * 0.7;
+        }
+      } else {
+        if (lineDistance == 2) {
+          damage = damage * 0.75;
+        } else if (lineDistance == 3) {
+          damage = damage * 0.5;
+        } else if (lineDistance > 3) {
+          damage = 0;
+        }
+      }
     }
     return damage;
   }
@@ -31,6 +49,18 @@ export default class {
     const chance = Phaser.Math.RND.between(1, 100);
     if (chance > chanceToHit) {
       damage = 0;
+    } else {
+      const lineDistance = Math.abs(
+        monsterInfo.lineIndex - playerInfo.lineIndex
+      );
+
+      if (lineDistance == 2) {
+        damage = damage * 0.75;
+      } else if (lineDistance == 3) {
+        damage = damage * 0.5;
+      } else if (lineDistance > 3) {
+        damage = 0;
+      }
     }
     return damage;
   }

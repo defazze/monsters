@@ -8,7 +8,7 @@ export default class {
 
   build() {
     if (SUPERHERO) {
-      this.playerInfo.health = 10000;
+      this.playerInfo.health = 100000;
       this.playerInfo.baseMinDamage = 1000;
       this.playerInfo.baseMaxDamage = 1000;
     }
