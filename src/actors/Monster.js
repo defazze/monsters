@@ -3,7 +3,17 @@ import Actor from "./Actor";
 import { CELL_SIZE } from "../constants/common";
 
 export class Monster extends Actor {
-  constructor({ scene, x, y, onClick, onAttack, onDead, health, monsterInfo }) {
+  constructor({
+    scene,
+    x,
+    y,
+    onClick,
+    onAttack,
+    onDead,
+    health,
+    monsterInfo,
+    battlefield
+  }) {
     super({
       scene,
       x,
@@ -14,6 +24,7 @@ export class Monster extends Actor {
       onDead
     });
 
+    this.battlefield = battlefield;
     this.scene = scene;
     this.monsterInfo = monsterInfo;
     this.lastAttackTime = 0;
@@ -33,20 +44,35 @@ export class Monster extends Actor {
 
     if (!this.isDead) {
       if (!this.monsterInfo.attackInterval) {
-        this.monsterInfo.attackInterval = 500;
+        this.monsterInfo.attackInterval = 1000;
       }
+
+      /*
       if (this.lastAttackTime == 0) {
-        this.lastAttackTime = time + this.monsterInfo.attackInterval;
-      }
+        this.lastAttackTime = time + this.monsterInfo.attackInterval/2;
+      }*/
 
       if (time > this.lastAttackTime + this.monsterInfo.attackInterval) {
         this.lastAttackTime = time;
-        this.onAttack(this.monsterInfo);
+        this.onAttack(this);
       }
     }
   }
 
   moveForward() {
+    this.battlefield.setCell(
+      this.monsterInfo.lineIndex,
+      this.monsterInfo.rowIndex,
+      null
+    );
+
+    this.monsterInfo.lineIndex--;
+    this.battlefield.setCell(
+      this.monsterInfo.lineIndex,
+      this.monsterInfo.rowIndex,
+      this.monsterInfo
+    );
+
     this.scene.tweens.add({
       targets: this,
       x: this.x - CELL_SIZE,

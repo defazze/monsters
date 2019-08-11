@@ -2,14 +2,15 @@ import Actor from "./Actor";
 import { CELL_SIZE } from "../constants/common";
 
 export class Player extends Actor {
-  constructor({ scene, x, y, playerInfo }) {
+  constructor({ scene, x, y, playerInfo, onDead }) {
     super({
       scene,
       x,
       y,
       health: playerInfo.health,
       asset: "hero",
-      name: "Hero"
+      name: "Hero",
+      onDead
     });
 
     this.playerInfo = playerInfo;

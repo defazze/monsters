@@ -102,11 +102,15 @@ export default class {
     };
   }
 
+  setCell(lineIndex, rowIndex, value) {
+    this.lines[lineIndex][rowIndex] = value;
+  }
+
   getLineByPriority(priorityLines) {
     if (priorityLines.length == 0) {
       return -1;
     }
-    const p = 70;
+    const p = 80;
 
     for (var i = 0; i < priorityLines.length; i++) {
       const chance = Phaser.Math.RND.between(1, 100);

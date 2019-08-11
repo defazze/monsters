@@ -11,57 +11,54 @@ export default class {
 
   generate(wave) {
     const enabledMonsters = this.monstersInfo.filter(
-      m => m.minWave <= wave && m.maxWave >= wave
+      m => m.minWave <= wave && m.maxWave >= wave && !m.isUnique
     );
-    const enabledMonsterCount = enabledMonsters.length;
+    enabledMonsters.forEach(
+      m => (m.priorityLines = m.priorityLines || [4, 5, 6, 7])
+    );
 
     const minCount = MonstersCount[0].min[wave - 1];
     const maxCount = MonstersCount[0].max[wave - 1];
     const count = Phaser.Math.RND.between(minCount, maxCount);
 
-    const generatedMonsters = [];
+    let generatedMonsters = [];
 
     for (var num = 1; num <= count; num++) {
-      const enabledMonsterIndex =
-        Phaser.Math.RND.between(1, enabledMonsterCount) - 1;
+      const monsterInfo = { ...Phaser.Utils.Array.GetRandom(enabledMonsters) };
 
-      const monsterInfo = { ...enabledMonsters[enabledMonsterIndex] };
-
-      const coords = this.battlefield.setMonster(monsterInfo);
-
-      const health = Phaser.Math.RND.between(
-        monsterInfo.minHealth,
-        monsterInfo.maxHealth
-      );
-
-      monsterInfo.coords = coords;
-      monsterInfo.health = health;
-
+      this.setMonster(monsterInfo);
       generatedMonsters.push(monsterInfo);
     }
+
+    const uniqueMonsters = this.monstersInfo.filter(
+      m => m.minWave <= wave && m.maxWave >= wave && m.isUnique
+    );
+
+    uniqueMonsters.forEach(monsterInfo => {
+      const spawnChance = Phaser.Math.RND.between(1, 100);
+      if (monsterInfo.spawnRate > spawnChance) {
+        this.setMonster(monsterInfo);
+        generatedMonsters.push(monsterInfo);
+        monsterInfo.priorityLines = monsterInfo.priorityLines || [4, 5, 6, 7];
+      }
+    });
+
+    generatedMonsters = generatedMonsters.sort(
+      (a, b) => a.priorityLines[0] - b.priorityLines[0]
+    );
 
     return generatedMonsters;
   }
 
-  getCoordinates(number) {
-    //Адов хардкод
-    switch (number) {
-      case 1:
-        return { x: CELL_SIZE * 6, y: CELL_SIZE * 4 };
-      case 2:
-        return { x: CELL_SIZE * 6, y: CELL_SIZE * 2 };
-      case 3:
-        return { x: CELL_SIZE * 6, y: CELL_SIZE * 6 };
-      case 4:
-        return { x: CELL_SIZE * 6, y: CELL_SIZE * 1 };
-      case 5:
-        return { x: CELL_SIZE * 6, y: CELL_SIZE * 7 };
-      case 6:
-        return { x: CELL_SIZE * 7, y: CELL_SIZE * 3 };
-      case 7:
-        return { x: CELL_SIZE * 7, y: CELL_SIZE * 5 };
-      case 8:
-        return { x: CELL_SIZE * 8, y: CELL_SIZE * 4 };
-    }
+  setMonster(monsterInfo) {
+    const coords = this.battlefield.setMonster(monsterInfo);
+
+    const health = Phaser.Math.RND.between(
+      monsterInfo.minHealth,
+      monsterInfo.maxHealth
+    );
+
+    monsterInfo.coords = coords;
+    monsterInfo.health = health;
   }
 }

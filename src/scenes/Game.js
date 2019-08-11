@@ -57,7 +57,8 @@ export default class extends Phaser.Scene {
       scene: this,
       x: CELL_SIZE * 4,
       y: CELL_SIZE * 4,
-      playerInfo: this.playerInfo
+      playerInfo: this.playerInfo,
+      onDead: this.onPlayerDead
     });
     this.add.existing(this.player);
 
@@ -72,7 +73,7 @@ export default class extends Phaser.Scene {
 
   update(time, delta) {
     if (this.monsters) {
-      this.monsters.forEach(m => m.update(time));
+      this.monsters.forEach(m => m.update(time, delta));
     }
 
     if (this.mustSpawn) {
@@ -95,8 +96,6 @@ export default class extends Phaser.Scene {
     const { monsterInfo } = monster;
     const damage = this.сalculator.toMonster(this.playerInfo, monsterInfo);
     monster.hit(damage);
-    if (monster.isDead) {
-    }
   };
 
   onMonsterDead = monster => {
@@ -126,11 +125,42 @@ export default class extends Phaser.Scene {
     }
   };
 
-  onMosterAttack = monsterInfo => {
-    const damage = this.сalculator.toPlayer(monsterInfo, this.playerInfo);
-    this.player.hit(damage);
-    if (this.player.currentHealth <= 0) {
-      this.scene.start("GameOverScene");
+  onPlayerDead = () => {
+    this.scene.start("GameOverScene");
+  };
+
+  onMosterAttack = monster => {
+    const { monsterInfo } = monster;
+    if (monsterInfo.isRanged) {
+      const start = {
+        x: monster.x,
+        y: monster.y + CELL_SIZE / 2
+      };
+      const end = {
+        x: this.player.x + CELL_SIZE / 2,
+        y: this.player.y + CELL_SIZE / 2
+      };
+      const arrow = this.add.sprite(start.x, start.y, "arrow");
+      const angle = Phaser.Math.Angle.Between(end.x, end.y, start.x, start.y);
+      const distance = Phaser.Math.Distance.Between(
+        end.x,
+        end.y,
+        start.x,
+        start.y
+      );
+      const speed = 0.2;
+      arrow.rotation = angle;
+
+      this.tweens.add({
+        targets: arrow,
+        x: end.x,
+        y: end.y,
+        duration: distance / speed,
+        onComplete: () => arrow.destroy()
+      });
+    } else {
+      const damage = this.сalculator.toPlayer(monsterInfo, this.playerInfo);
+      this.player.hit(damage);
     }
   };
 
@@ -167,11 +197,11 @@ export default class extends Phaser.Scene {
         health: monsterInfo.health,
         onClick: this.onMonsterClick,
         onAttack: this.onMosterAttack,
-        onDead: this.onMonsterDead
+        onDead: this.onMonsterDead,
+        battlefield: this.battlefield
       });
 
       this.add.existing(monster);
-
       return monster;
     });
   }
