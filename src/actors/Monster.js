@@ -12,7 +12,8 @@ export class Monster extends Actor {
     onDead,
     health,
     monsterInfo,
-    battlefield
+    battlefield,
+    player
   }) {
     super({
       scene,
@@ -29,6 +30,7 @@ export class Monster extends Actor {
     this.monsterInfo = monsterInfo;
     this.lastAttackTime = 0;
     this.onAttack = onAttack;
+    this.player = player;
 
     this.setInteractive({
       hitArea: new Phaser.Geom.Rectangle(0, 0, 96, 96),
@@ -53,6 +55,53 @@ export class Monster extends Actor {
       }*/
 
       if (time > this.lastAttackTime + this.monsterInfo.attackInterval) {
+        if (this.monsterInfo.isRanged) {
+          const start = {
+            x: this.x,
+            y: this.y + CELL_SIZE / 2
+          };
+          const end = {
+            x: this.player.x + CELL_SIZE / 2,
+            y: this.player.y + CELL_SIZE / 2
+          };
+          const arrow = this.scene.physics.add.sprite(
+            start.x,
+            start.y,
+            "arrow"
+          );
+          const angle = Phaser.Math.Angle.Between(
+            end.x,
+            end.y,
+            start.x,
+            start.y
+          );
+          const distance = Phaser.Math.Distance.Between(
+            end.x,
+            end.y,
+            start.x,
+            start.y
+          );
+          const speed = 0.2;
+          arrow.rotation = angle;
+
+          this.scene.tweens.add({
+            targets: arrow,
+            x: end.x,
+            y: end.y,
+            duration:
+              distance /
+              speed /*,
+            onComplete: () => arrow.destroy()*/
+          });
+
+          this.scene.physics.add.overlap(
+            this.player.sprite,
+            arrow,
+            this.onRangeHit,
+            null,
+            this
+          );
+        }
         this.lastAttackTime = time;
         this.onAttack(this);
       }
@@ -80,4 +129,8 @@ export class Monster extends Actor {
       duration: 1000
     });
   }
+
+  onRangeHit = (player, arrow) => {
+    arrow.destroy();
+  };
 }

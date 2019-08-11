@@ -5,5 +5,11 @@ export default {
   parent: "content",
   width: 1056,
   height: 864,
-  localStorageName: "phaseres6webpack"
+  localStorageName: "phaseres6webpack",
+  physics: {
+    default: "arcade",
+    arcade: {
+      debug: false
+    }
+  }
 };

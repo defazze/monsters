@@ -131,37 +131,8 @@ export default class extends Phaser.Scene {
 
   onMosterAttack = monster => {
     const { monsterInfo } = monster;
-    if (monsterInfo.isRanged) {
-      const start = {
-        x: monster.x,
-        y: monster.y + CELL_SIZE / 2
-      };
-      const end = {
-        x: this.player.x + CELL_SIZE / 2,
-        y: this.player.y + CELL_SIZE / 2
-      };
-      const arrow = this.add.sprite(start.x, start.y, "arrow");
-      const angle = Phaser.Math.Angle.Between(end.x, end.y, start.x, start.y);
-      const distance = Phaser.Math.Distance.Between(
-        end.x,
-        end.y,
-        start.x,
-        start.y
-      );
-      const speed = 0.2;
-      arrow.rotation = angle;
-
-      this.tweens.add({
-        targets: arrow,
-        x: end.x,
-        y: end.y,
-        duration: distance / speed,
-        onComplete: () => arrow.destroy()
-      });
-    } else {
-      const damage = this.сalculator.toPlayer(monsterInfo, this.playerInfo);
-      this.player.hit(damage);
-    }
+    const damage = this.сalculator.toPlayer(monsterInfo, this.playerInfo);
+    this.player.hit(damage);
   };
 
   onPotionClick = () => {
@@ -198,7 +169,8 @@ export default class extends Phaser.Scene {
         onClick: this.onMonsterClick,
         onAttack: this.onMosterAttack,
         onDead: this.onMonsterDead,
-        battlefield: this.battlefield
+        battlefield: this.battlefield,
+        player: this.player
       });
 
       this.add.existing(monster);
