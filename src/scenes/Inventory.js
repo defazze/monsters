@@ -56,27 +56,27 @@ export default class extends Phaser.Scene {
 
     this.input.setDraggable(potion);
 
-    this.input.on("drag", function(pointer, gameObject, dragX, dragY) {
+    this.input.on("drag", (pointer, gameObject, dragX, dragY) => {
       gameObject.x = dragX;
       gameObject.y = dragY;
     });
 
-    this.input.on("dragenter", function(pointer, gameObject, dropZone) {
+    this.input.on("dragenter", (pointer, gameObject, dropZone) => {
       dropZone.setFillStyle(0x777676, 1);
     });
 
-    this.input.on("dragleave", function(pointer, gameObject, dropZone) {
+    this.input.on("dragleave", (pointer, gameObject, dropZone) => {
       dropZone.setFillStyle(0x838383, 1);
     });
 
-    this.input.on("drop", function(pointer, gameObject, dropZone) {
+    this.input.on("drop", (pointer, gameObject, dropZone) => {
       gameObject.x = dropZone.x;
       gameObject.y = dropZone.y;
 
       dropZone.setFillStyle(0x838383, 1);
     });
 
-    this.input.on("dragend", function(pointer, gameObject, dropped) {
+    this.input.on("dragend", (pointer, gameObject, dropped) => {
       if (!dropped) {
         gameObject.x = gameObject.input.dragStartX;
         gameObject.y = gameObject.input.dragStartY;

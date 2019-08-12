@@ -122,7 +122,7 @@ export default class extends Phaser.Scene {
     if (this.monsters.every(m => m.isDead || m.monsterInfo.isPermanent)) {
       this.wave++;
       if (this.wave > 10) {
-        this.scene.start("GameOverScene");
+        this.scene.start("WinScene");
       } else {
         this.mustSpawn = true;
         this.setHeader(this.wave);

@@ -6,6 +6,7 @@ import GameScene from "./scenes/Game";
 import GameOverScene from "./scenes/GameOver";
 import CastleScene from "./scenes/Castle";
 import InventoryScene from "./scenes/Inventory";
+import WinScene from "./scenes/Win";
 
 import config from "./config";
 
@@ -16,7 +17,8 @@ const gameConfig = Object.assign(config, {
     GameScene,
     GameOverScene,
     CastleScene,
-    InventoryScene
+    InventoryScene,
+    WinScene
   ]
 });
 
