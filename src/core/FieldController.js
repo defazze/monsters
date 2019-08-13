@@ -72,12 +72,15 @@ export default class {
 
   setMonster(monsterInfo) {
     const enableLines = this.setLinesStatus();
+
     let priorityLines = monsterInfo.priorityLines
       ? monsterInfo.priorityLines
       : [4, 5, 6, 7];
 
     priorityLines = priorityLines.filter(l => enableLines.some(a => a == l));
+
     let monsterLineIndex = this.getLineByPriority(priorityLines);
+
     if (monsterLineIndex == -1) {
       monsterLineIndex = Phaser.Utils.Array.GetRandom(enableLines);
     }

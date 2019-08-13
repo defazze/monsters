@@ -1,0 +1,10 @@
+[
+  {
+    "type": "potion",
+    "resource": "health",
+    "grade": 0,
+    "asset": "hp-potion",
+    "recoveryCount": 20,
+    "recoveryTime": 7
+  }
+]

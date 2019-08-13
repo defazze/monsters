@@ -25,10 +25,18 @@ export default class extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor(0x8ee5ee);
 
+    this.background = this.add.tileSprite(
+      CELL_SIZE + (CELL_SIZE * 9) / 2,
+      CELL_SIZE + (CELL_SIZE * 7) / 2,
+      CELL_SIZE * 9,
+      CELL_SIZE * 7,
+      "grass"
+    );
+
     this.anims.create({
       key: "flip",
       frames: this.anims.generateFrameNumbers("coin"),
-      frameRate: 20,
+      frameRate: 30,
       repeat: 1,
       hideOnComplete: true
     });
@@ -117,6 +125,14 @@ export default class extends Phaser.Scene {
       );
 
       monsters.forEach(m => m.moveForward());
+      if (monsters.some(m => !m.isDead)) {
+        this.tweens.add({
+          targets: this.background,
+          tilePositionX: this.background.tilePositionX + CELL_SIZE,
+          ease: "Sine.easeInOut",
+          duration: 1000
+        });
+      }
     }
 
     if (this.monsters.every(m => m.isDead || m.monsterInfo.isPermanent)) {
@@ -197,9 +213,9 @@ export default class extends Phaser.Scene {
     this.tweens.add({
       targets: coin,
       y: monster.y + CELL_SIZE / 2 - 30,
-      alpha: 0,
+      /*alpha: 0.5,*/
       ease: "Sine.easeInOut",
-      duration: 500
+      duration: 400
     });
   }
 }

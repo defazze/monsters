@@ -1,0 +1,10 @@
+{
+  "strength": 30,
+  "dexterity": 20,
+  "vitality": 25,
+  "intellect": 10,
+  "health": 55,
+  "baseMinDamage": 1,
+  "baseMaxDamage": 2,
+  "lineIndex": 3
+}

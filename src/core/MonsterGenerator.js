@@ -25,8 +25,6 @@ export default class {
 
     for (var num = 1; num <= count; num++) {
       const monsterInfo = { ...Phaser.Utils.Array.GetRandom(enabledMonsters) };
-
-      this.setMonster(monsterInfo);
       generatedMonsters.push(monsterInfo);
     }
 
@@ -37,7 +35,6 @@ export default class {
     uniqueMonsters.forEach(monsterInfo => {
       const spawnChance = Phaser.Math.RND.between(1, 100);
       if (monsterInfo.spawnRate > spawnChance) {
-        this.setMonster(monsterInfo);
         generatedMonsters.push(monsterInfo);
         monsterInfo.priorityLines = monsterInfo.priorityLines || [4, 5, 6, 7];
       }
@@ -47,6 +44,7 @@ export default class {
       (a, b) => a.priorityLines[0] - b.priorityLines[0]
     );
 
+    generatedMonsters.forEach(m => this.setMonster(m));
     return generatedMonsters;
   }
 

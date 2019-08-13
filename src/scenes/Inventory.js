@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import Item from "../graphics/StackableItem";
 
 const CELL_SIZE = 48;
 const BORDER_WIDTH = 4;
@@ -46,13 +47,13 @@ export default class extends Phaser.Scene {
       }
     }
 
-    const potion = this.add
-      .image(
-        X + BORDER_WIDTH + CELL_SIZE / 2,
-        Y + BORDER_WIDTH + CELL_SIZE / 2,
-        "hp-potion"
-      )
-      .setInteractive();
+    const potion = new Item({
+      scene: this,
+      x: X + BORDER_WIDTH + CELL_SIZE / 2,
+      y: Y + BORDER_WIDTH + CELL_SIZE / 2,
+      asset: "hp-potion",
+      count: 12
+    });
 
     this.input.setDraggable(potion);
 
