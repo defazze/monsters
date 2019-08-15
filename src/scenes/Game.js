@@ -88,7 +88,7 @@ export default class extends Phaser.Scene {
     this.inventory.add(potionItem);
     this.inventory.add(potionItem);
 
-    const potion = new Item({
+    this.hpPotion = new Item({
       scene: this,
       x: CELL_SIZE * 1.5,
       y: CELL_SIZE * 8.5,
@@ -173,12 +173,12 @@ export default class extends Phaser.Scene {
     const { itemInfo } = potion;
     this.inventory.remove(itemInfo);
     potion.refresh();
-    this.player.regenerate(10, 2000);
+    this.player.regenerate(itemInfo.recoveryCount, itemInfo.recoveryTime);
   };
 
   onKeyPressed = event => {
     if (event.key == "1") {
-      this.player.regenerate(10, 2000);
+      this.onPotionClick(this.hpPotion);
     }
   };
 

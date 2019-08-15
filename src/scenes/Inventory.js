@@ -17,6 +17,7 @@ export default class extends Phaser.Scene {
   preload() {}
 
   create() {
+    const { inventory } = this.customData;
     this.cameras.main.setBackgroundColor(0x34c70e);
 
     const battlefield = this.add
@@ -24,7 +25,7 @@ export default class extends Phaser.Scene {
       .setInteractive();
     battlefield.on("pointerdown", () => {
       this.scene.stop("InventoryScene");
-      this.scene.start("GameScene", this.customData);
+      this.scene.run("GameScene", this.customData);
     });
 
     const backgroundWidth =
@@ -53,7 +54,7 @@ export default class extends Phaser.Scene {
       }
     }
 
-    this.customData.inventory.Items.forEach(i => {
+    inventory.Items.forEach(i => {
       const x =
         X + BORDER_WIDTH * (i.column + 1) + CELL_SIZE * (i.column + 0.5);
       const y = Y + BORDER_WIDTH * (i.row + 1) + CELL_SIZE * (i.row + 0.5);
@@ -79,6 +80,11 @@ export default class extends Phaser.Scene {
       gameObject.x = dropZone.x;
       gameObject.y = dropZone.y;
 
+      inventory.moveTo(
+        gameObject.itemInfo,
+        dropZone.rowIndex,
+        dropZone.columnIndex
+      );
       dropZone.setFillStyle(0x838383, 1);
     });
 

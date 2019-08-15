@@ -50,6 +50,13 @@ export default class {
     }
   }
 
+  moveTo(itemInfo, rowIndex, columnIndex) {
+    this.inventory[itemInfo.row][itemInfo.column] = null;
+    this.inventory[(rowIndex, columnIndex)] = itemInfo;
+    itemInfo.row = rowIndex;
+    itemInfo.column = columnIndex;
+  }
+
   getFirstEmptyCell() {
     for (var i = 0; i < INVENTORY_ROWS; i++) {
       for (var j = 0; j < INVENTORY_COLUMNS; j++) {

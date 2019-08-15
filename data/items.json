@@ -4,8 +4,8 @@
     "resource": "health",
     "grade": 0,
     "asset": "hp-potion",
-    "recoveryCount": 20,
-    "recoveryTime": 7,
+    "recoveryCount": 40,
+    "recoveryTime": 6000,
     "stackable": true
   }
 ]
