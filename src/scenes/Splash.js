@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import InventoryController from "../core/InventoryController";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -31,7 +32,8 @@ export default class extends Phaser.Scene {
   }
 
   create() {
-    this.scene.start("GameScene");
+    const inventory = new InventoryController();
+    this.scene.start("GameScene", { inventory });
   }
 
   update() {}

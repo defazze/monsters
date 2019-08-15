@@ -10,16 +10,22 @@ import { CELL_SIZE, SPAWN_DELAY } from "../constants/common";
 import { Player } from "../actors/Player";
 import Potion from "../sprites/HpPotion";
 import Battlefield from "../core/FieldController.js";
+import Item from "../graphics/Item";
 
 export default class extends Phaser.Scene {
   constructor() {
     super({ key: "GameScene" });
   }
 
-  init() {}
+  init(data) {
+    this.customData = data;
+  }
+
   preload() {}
 
   create() {
+    this.inventory = this.customData.inventory;
+
     this.spawnTime = 0;
     this.spawnDelayRun = false;
 
@@ -41,13 +47,16 @@ export default class extends Phaser.Scene {
       hideOnComplete: true
     });
 
-    const castle = this.add.sprite(150, 50, "castle").setInteractive();
-    castle.on("pointerdown", () => this.scene.switch("CastleScene"));
+    const castleIcon = this.add.sprite(150, 50, "castle").setInteractive();
+    castleIcon.on("pointerdown", () => this.scene.switch("CastleScene"));
 
-    const inventory = this.add
+    const inventoryIcon = this.add
       .sprite(229, 50, "inventory-icon")
       .setInteractive();
-    inventory.on("pointerdown", () => this.scene.switch("InventoryScene"));
+    inventoryIcon.on("pointerdown", () => {
+      this.scene.sleep("GameScene");
+      this.scene.run("InventoryScene", this.customData);
+    });
 
     this.setHeader(1);
 
@@ -75,13 +84,17 @@ export default class extends Phaser.Scene {
     });
     this.add.existing(this.player);
 
-    const potion = new Potion({
+    const potionItem = this.inventory.AllItems[0];
+    this.inventory.add(potionItem);
+    this.inventory.add(potionItem);
+
+    const potion = new Item({
       scene: this,
       x: CELL_SIZE * 1.5,
       y: CELL_SIZE * 8.5,
+      itemInfo: potionItem,
       onClick: this.onPotionClick
     });
-    this.add.existing(potion);
   }
 
   update(time, delta) {
@@ -156,7 +169,10 @@ export default class extends Phaser.Scene {
     this.player.hit(damage);
   };
 
-  onPotionClick = () => {
+  onPotionClick = potion => {
+    const { itemInfo } = potion;
+    this.inventory.remove(itemInfo);
+    potion.refresh();
     this.player.regenerate(10, 2000);
   };
 

@@ -5,6 +5,7 @@
     "grade": 0,
     "asset": "hp-potion",
     "recoveryCount": 20,
-    "recoveryTime": 7
+    "recoveryTime": 7,
+    "stackable": true
   }
 ]

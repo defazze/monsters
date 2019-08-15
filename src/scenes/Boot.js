@@ -14,13 +14,6 @@ export default class extends Phaser.Scene {
     this.load.image("loaderBg", "./assets/images/loader-bg.png");
     this.load.image("loaderBar", "./assets/images/loader-bar.png");
 
-    /*
-    WebFont.load({
-      google: {
-        families: ['Bangers']
-      },
-      active: this.fontsLoaded
-    })*/
     this.fontsReady = true;
   }
 

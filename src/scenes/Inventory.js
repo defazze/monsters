@@ -1,10 +1,9 @@
 import Phaser from "phaser";
-import Item from "../graphics/StackableItem";
+import { INVENTORY_COLUMNS, INVENTORY_ROWS } from "../constants/inventory";
+import Item from "../graphics/Item";
 
 const CELL_SIZE = 48;
 const BORDER_WIDTH = 4;
-const COLUMNS = 12;
-const ROWS = 6;
 const X = 200;
 const Y = 400;
 
@@ -12,7 +11,9 @@ export default class extends Phaser.Scene {
   constructor() {
     super({ key: "InventoryScene" });
   }
-  init() {}
+  init(data) {
+    this.customData = data;
+  }
   preload() {}
 
   create() {
@@ -21,10 +22,15 @@ export default class extends Phaser.Scene {
     const battlefield = this.add
       .sprite(150, 50, "battlefield")
       .setInteractive();
-    battlefield.on("pointerdown", () => this.scene.switch("GameScene"));
+    battlefield.on("pointerdown", () => {
+      this.scene.stop("InventoryScene");
+      this.scene.start("GameScene", this.customData);
+    });
 
-    const backgroundWidth = COLUMNS * CELL_SIZE + (COLUMNS + 1) * BORDER_WIDTH;
-    const backgroundHeight = ROWS * CELL_SIZE + (ROWS + 1) * BORDER_WIDTH;
+    const backgroundWidth =
+      INVENTORY_COLUMNS * CELL_SIZE + (INVENTORY_COLUMNS + 1) * BORDER_WIDTH;
+    const backgroundHeight =
+      INVENTORY_ROWS * CELL_SIZE + (INVENTORY_ROWS + 1) * BORDER_WIDTH;
 
     const background = this.add.rectangle(
       X + backgroundWidth / 2,
@@ -34,8 +40,8 @@ export default class extends Phaser.Scene {
       0xffffff
     );
 
-    for (var i = 0; i < COLUMNS; i++) {
-      for (var j = 0; j < ROWS; j++) {
+    for (var i = 0; i < INVENTORY_COLUMNS; i++) {
+      for (var j = 0; j < INVENTORY_ROWS; j++) {
         const x = X + CELL_SIZE * (i + 0.5) + BORDER_WIDTH * (i + 1);
         const y = Y + CELL_SIZE * (j + 0.5) + BORDER_WIDTH * (j + 1);
 
@@ -47,15 +53,14 @@ export default class extends Phaser.Scene {
       }
     }
 
-    const potion = new Item({
-      scene: this,
-      x: X + BORDER_WIDTH + CELL_SIZE / 2,
-      y: Y + BORDER_WIDTH + CELL_SIZE / 2,
-      asset: "hp-potion",
-      count: 12
-    });
+    this.customData.inventory.Items.forEach(i => {
+      const x =
+        X + BORDER_WIDTH * (i.column + 1) + CELL_SIZE * (i.column + 0.5);
+      const y = Y + BORDER_WIDTH * (i.row + 1) + CELL_SIZE * (i.row + 0.5);
+      const itemObject = new Item({ scene: this, x, y, itemInfo: i });
 
-    this.input.setDraggable(potion);
+      this.input.setDraggable(itemObject);
+    });
 
     this.input.on("drag", (pointer, gameObject, dragX, dragY) => {
       gameObject.x = dragX;
