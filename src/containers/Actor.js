@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import HealthBar from "../graphics/HealthBar";
+import HealthBar from "../containers/HealthBar";
 import Regenerator from "../core/Regenerator";
 
 export default class extends Phaser.GameObjects.Container {

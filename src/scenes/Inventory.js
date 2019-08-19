@@ -1,6 +1,5 @@
 import Phaser from "phaser";
-import { INVENTORY_COLUMNS, INVENTORY_ROWS } from "../constants/inventory";
-import Item from "../graphics/Item";
+import Item from "../containers/Item";
 import ItemsContainer from "../containers/ItemsContainer";
 
 const X = 200;
@@ -31,8 +30,8 @@ export default class extends Phaser.Scene {
       scene: this,
       x: X,
       y: Y,
-      rows: INVENTORY_ROWS,
-      columns: INVENTORY_COLUMNS,
+      rows: inventory.rowsCount,
+      columns: inventory.columnsCount,
       onDrop: (gameObject, dropZone) => {
         inventory.moveTo(
           gameObject.itemInfo,
@@ -45,8 +44,8 @@ export default class extends Phaser.Scene {
     this.add.existing(itemsContainer);
 
     inventory.Items.forEach(i => {
-      const x = itemsContainer.getItemX(i.column);
-      const y = itemsContainer.getItemY(i.row);
+      const x = itemsContainer.getItemX(i.columnIndex);
+      const y = itemsContainer.getItemY(i.rowIndex);
       const itemObject = new Item({ scene: this, x, y, itemInfo: i });
 
       this.input.setDraggable(itemObject);

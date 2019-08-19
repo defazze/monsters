@@ -4,7 +4,9 @@ export default class extends Phaser.Scene {
   constructor() {
     super({ key: "CastleScene" });
   }
-  init() {}
+  init(data) {
+    this.customData = data;
+  }
   preload() {}
 
   create() {
@@ -14,6 +16,11 @@ export default class extends Phaser.Scene {
       .sprite(150, 50, "battlefield")
       .setInteractive();
     battlefield.on("pointerdown", () => this.scene.switch("GameScene"));
+
+    const store = this.add.sprite(229, 50, "store").setInteractive();
+    store.on("pointerdown", () =>
+      this.scene.start("TradeScene", this.customData)
+    );
 
     this.add.sprite(528, 432, "castle-big");
   }

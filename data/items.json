@@ -7,5 +7,14 @@
     "recoveryCount": 40,
     "recoveryTime": 6000,
     "stackable": true
+  },
+  {
+    "type": "potion",
+    "resource": "mana",
+    "grade": 0,
+    "asset": "mana-potion",
+    "recoveryCount": 40,
+    "recoveryTime": 6000,
+    "stackable": true
   }
 ]

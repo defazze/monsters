@@ -1,16 +1,14 @@
 /* globals __DEV__ */
 import Phaser from "phaser";
 
-import Actor from "../actors/Actor";
-import { Monster } from "../actors/Monster";
+import { Monster } from "../containers/Monster";
 import Generator from "../core/MonsterGenerator";
 import Builder from "../core/PlayerBuilder";
 import Calculator from "../core/DamageCalculator";
 import { CELL_SIZE, SPAWN_DELAY } from "../constants/common";
-import { Player } from "../actors/Player";
-import Potion from "../sprites/HpPotion";
+import { Player } from "../containers/Player";
 import Battlefield from "../core/FieldController.js";
-import Item from "../graphics/Item";
+import Item from "../containers/Item";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -48,7 +46,9 @@ export default class extends Phaser.Scene {
     });
 
     const castleIcon = this.add.sprite(150, 50, "castle").setInteractive();
-    castleIcon.on("pointerdown", () => this.scene.switch("CastleScene"));
+    castleIcon.on("pointerdown", () =>
+      this.scene.start("CastleScene", this.customData)
+    );
 
     const inventoryIcon = this.add
       .sprite(229, 50, "inventory-icon")
@@ -84,15 +84,11 @@ export default class extends Phaser.Scene {
     });
     this.add.existing(this.player);
 
-    const potionItem = this.inventory.AllItems[0];
-    this.inventory.add(potionItem);
-    this.inventory.add(potionItem);
-
     this.hpPotion = new Item({
       scene: this,
       x: CELL_SIZE * 1.5,
       y: CELL_SIZE * 8.5,
-      itemInfo: potionItem,
+      itemInfo: this.inventory.itemsInfo[0],
       onClick: this.onPotionClick
     });
   }

@@ -10,7 +10,8 @@ export default class extends Phaser.GameObjects.Container {
     columns,
     onDrop,
     cellSize = CELL_SIZE,
-    borderWidth = BORDER_WIDTH
+    borderWidth = BORDER_WIDTH,
+    isDraggable = true
   }) {
     super(scene, x, y);
 
@@ -35,7 +36,8 @@ export default class extends Phaser.GameObjects.Container {
         const y = cellSize * (j + 0.5) + borderWidth * (j + 1);
 
         const cell = scene.add.rectangle(x, y, cellSize, cellSize, 0x838383);
-        cell.setInteractive(undefined, undefined, true);
+
+        cell.setInteractive(undefined, undefined, isDraggable);
 
         cell.columnIndex = i;
         cell.rowIndex = j;
@@ -44,36 +46,38 @@ export default class extends Phaser.GameObjects.Container {
       }
     }
 
-    scene.input.on("drag", (pointer, gameObject, dragX, dragY) => {
-      gameObject.x = dragX;
-      gameObject.y = dragY;
-    });
+    if (isDraggable) {
+      scene.input.on("drag", (pointer, gameObject, dragX, dragY) => {
+        gameObject.x = dragX;
+        gameObject.y = dragY;
+      });
 
-    scene.input.on("dragenter", (pointer, gameObject, dropZone) => {
-      dropZone.setFillStyle(0x777676, 1);
-    });
+      scene.input.on("dragenter", (pointer, gameObject, dropZone) => {
+        dropZone.setFillStyle(0x777676, 1);
+      });
 
-    scene.input.on("dragleave", (pointer, gameObject, dropZone) => {
-      dropZone.setFillStyle(0x838383, 1);
-    });
+      scene.input.on("dragleave", (pointer, gameObject, dropZone) => {
+        dropZone.setFillStyle(0x838383, 1);
+      });
 
-    scene.input.on("drop", (pointer, gameObject, dropZone) => {
-      gameObject.x = dropZone.x + this.x;
-      gameObject.y = dropZone.y + this.y;
+      scene.input.on("drop", (pointer, gameObject, dropZone) => {
+        gameObject.x = dropZone.x + this.x;
+        gameObject.y = dropZone.y + this.y;
 
-      if (onDrop) {
-        onDrop(gameObject, dropZone);
-      }
+        if (onDrop) {
+          onDrop(gameObject, dropZone);
+        }
 
-      dropZone.setFillStyle(0x838383, 1);
-    });
+        dropZone.setFillStyle(0x838383, 1);
+      });
 
-    scene.input.on("dragend", (pointer, gameObject, dropped) => {
-      if (!dropped) {
-        gameObject.x = gameObject.input.dragStartX;
-        gameObject.y = gameObject.input.dragStartY;
-      }
-    });
+      scene.input.on("dragend", (pointer, gameObject, dropped) => {
+        if (!dropped) {
+          gameObject.x = gameObject.input.dragStartX;
+          gameObject.y = gameObject.input.dragStartY;
+        }
+      });
+    }
   }
 
   getItemX(columnIndex) {

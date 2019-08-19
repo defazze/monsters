@@ -1,22 +1,23 @@
 import Phaser from "phaser";
-import { INVENTORY_COLUMNS, INVENTORY_ROWS } from "../constants/inventory";
-import ItemData from "../../data/items.json";
 
 export default class {
-  constructor() {
+  constructor({ rowsCount, columnsCount }) {
+    this.rowsCount = rowsCount;
+    this.columnsCount = columnsCount;
     this.itemsInfo = [];
-    this.inventory = new Array(INVENTORY_ROWS).fill(
-      new Array(INVENTORY_COLUMNS).fill(null)
+    this.inventory = new Array(rowsCount).fill(
+      new Array(columnsCount).fill(null)
     );
   }
 
-  add(itemInfo) {
+  add(itemInfo, count = 1) {
     const addNewItem = () => {
+      itemInfo = { ...itemInfo };
       const emptyCell = this.getFirstEmptyCell();
-      itemInfo.row = emptyCell.row;
-      itemInfo.column = emptyCell.column;
-      this.inventory[itemInfo.row][itemInfo.column] = itemInfo;
-      itemInfo.count = 1;
+      itemInfo.rowIndex = emptyCell.rowIndex;
+      itemInfo.columnIndex = emptyCell.columnIndex;
+      this.inventory[itemInfo.rowIndex][itemInfo.columnIndex] = itemInfo;
+      itemInfo.count = itemInfo.stackable ? count : 1;
       this.Items.push(itemInfo);
     };
 
@@ -24,7 +25,7 @@ export default class {
       const existingItem = this.findStackableItem(itemInfo);
 
       if (existingItem) {
-        existingItem.count++;
+        existingItem.count += count;
       } else {
         addNewItem();
       }
@@ -36,7 +37,7 @@ export default class {
   remove(itemInfo) {
     const removeItem = () => {
       Phaser.Utils.Array.Remove(this.Items, itemInfo);
-      this.inventory[itemInfo.row][itemInfo.column] = null;
+      this.inventory[itemInfo.rowIndex][itemInfo.columnIndex] = null;
     };
 
     if (itemInfo.stackable) {
@@ -51,17 +52,17 @@ export default class {
   }
 
   moveTo(itemInfo, rowIndex, columnIndex) {
-    this.inventory[itemInfo.row][itemInfo.column] = null;
-    this.inventory[(rowIndex, columnIndex)] = itemInfo;
-    itemInfo.row = rowIndex;
-    itemInfo.column = columnIndex;
+    this.inventory[itemInfo.rowIndex][itemInfo.columnIndex] = null;
+    this.inventory[rowIndex][columnIndex] = itemInfo;
+    itemInfo.rowIndex = rowIndex;
+    itemInfo.columnIndex = columnIndex;
   }
 
   getFirstEmptyCell() {
-    for (var i = 0; i < INVENTORY_ROWS; i++) {
-      for (var j = 0; j < INVENTORY_COLUMNS; j++) {
+    for (var i = 0; i < this.rowsCount; i++) {
+      for (var j = 0; j < this.columnsCount; j++) {
         if (!this.inventory[i][j]) {
-          return { row: i, column: j };
+          return { rowIndex: i, columnIndex: j };
         }
       }
     }
@@ -83,9 +84,5 @@ export default class {
 
   get Items() {
     return this.itemsInfo;
-  }
-
-  get AllItems() {
-    return ItemData;
   }
 }
