@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { CELL_SIZE, BORDER_WIDTH } from "../constants/inventory";
+import Item from "../containers/Item";
 
 export default class extends Phaser.GameObjects.Container {
   constructor({
@@ -15,6 +16,8 @@ export default class extends Phaser.GameObjects.Container {
   }) {
     super(scene, x, y);
 
+    this.scene = scene;
+    this.isDraggable = isDraggable;
     this.borderWidth = borderWidth;
     this.cellSize = cellSize;
 
@@ -78,6 +81,18 @@ export default class extends Phaser.GameObjects.Container {
         }
       });
     }
+  }
+
+  fill(itemsInfo) {
+    itemsInfo.forEach(i => {
+      const x = this.getItemX(i.columnIndex);
+      const y = this.getItemY(i.rowIndex);
+      const item = new Item({ scene: this.scene, x, y, itemInfo: i });
+
+      if (this.isDraggable) {
+        this.scene.input.setDraggable(item);
+      }
+    });
   }
 
   getItemX(columnIndex) {

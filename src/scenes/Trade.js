@@ -1,6 +1,4 @@
 import Phaser from "phaser";
-import { INVENTORY_COLUMNS, INVENTORY_ROWS } from "../constants/inventory";
-import Item from "../containers/Item";
 import ItemsContainer from "../containers/ItemsContainer";
 
 const X = 200;
@@ -38,7 +36,6 @@ export default class extends Phaser.Scene {
         );
       }
     });
-
     this.add.existing(playerContainer);
 
     const traderContainer = new ItemsContainer({
@@ -49,21 +46,9 @@ export default class extends Phaser.Scene {
       columns: traderInventory.columnsCount,
       isDraggable: false
     });
-
     this.add.existing(traderContainer);
 
-    inventory.Items.forEach(i => {
-      const x = playerContainer.getItemX(i.columnIndex);
-      const y = playerContainer.getItemY(i.rowIndex);
-      const itemObject = new Item({ scene: this, x, y, itemInfo: i });
-
-      this.input.setDraggable(itemObject);
-    });
-
-    traderInventory.Items.forEach(i => {
-      const x = traderContainer.getItemX(i.columnIndex);
-      const y = traderContainer.getItemY(i.rowIndex);
-      const itemObject = new Item({ scene: this, x, y, itemInfo: i });
-    });
+    traderContainer.fill(traderInventory.Items);
+    playerContainer.fill(inventory.Items);
   }
 }

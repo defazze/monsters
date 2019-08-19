@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import Item from "../containers/Item";
 import ItemsContainer from "../containers/ItemsContainer";
 
 const X = 200;
@@ -42,13 +41,6 @@ export default class extends Phaser.Scene {
     });
 
     this.add.existing(itemsContainer);
-
-    inventory.Items.forEach(i => {
-      const x = itemsContainer.getItemX(i.columnIndex);
-      const y = itemsContainer.getItemY(i.rowIndex);
-      const itemObject = new Item({ scene: this, x, y, itemInfo: i });
-
-      this.input.setDraggable(itemObject);
-    });
+    itemsContainer.fill(inventory.Items);
   }
 }

@@ -167,9 +167,11 @@ export default class extends Phaser.Scene {
 
   onPotionClick = potion => {
     const { itemInfo } = potion;
-    this.inventory.remove(itemInfo);
-    potion.refresh();
-    this.player.regenerate(itemInfo.recoveryCount, itemInfo.recoveryTime);
+    if (itemInfo && itemInfo.count > 0) {
+      this.inventory.remove(itemInfo);
+      potion.refresh();
+      this.player.regenerate(itemInfo.recoveryCount, itemInfo.recoveryTime);
+    }
   };
 
   onKeyPressed = event => {
