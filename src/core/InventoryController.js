@@ -1,4 +1,6 @@
 import Phaser from "phaser";
+import { observable } from "../utils/Observable";
+
 export default class {
   constructor({ rowsCount, columnsCount }) {
     this.rowsCount = rowsCount;
@@ -11,35 +13,16 @@ export default class {
 
   add = (itemInfo, count = 1) => {
     const addNewItem = () => {
-      itemInfo = new Proxy(
-        {
-          ...itemInfo,
-          middlewares: [],
-          count: 0
-        },
-        {
-          subscribe: target => callback => {
-            target.middlewares.push(callback);
-          },
-          get(target, prop) {
-            if (prop == "subscribe") {
-              return this.subscribe(target);
-            }
-            return target[prop];
-          },
-          set(target, prop, val) {
-            target[prop] = val;
-            target.middlewares.forEach(m => m({ prop, val }));
-            return true;
-          }
-        }
-      );
-
       const emptyCell = this.getFirstEmptyCell();
-      itemInfo.rowIndex = emptyCell.rowIndex;
-      itemInfo.columnIndex = emptyCell.columnIndex;
+
+      itemInfo = observable({
+        ...itemInfo,
+        count: itemInfo.stackable ? count : 1,
+        rowIndex: emptyCell.rowIndex,
+        columnIndex: emptyCell.columnIndex
+      });
+
       this.inventory[itemInfo.rowIndex][itemInfo.columnIndex] = itemInfo;
-      itemInfo.count = itemInfo.stackable ? count : 1;
       this.Items.push(itemInfo);
     };
 

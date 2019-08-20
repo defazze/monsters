@@ -169,7 +169,6 @@ export default class extends Phaser.Scene {
     const { itemInfo } = potion;
     if (itemInfo && itemInfo.count > 0) {
       this.inventory.remove(itemInfo);
-      //potion.refresh();
       this.player.regenerate(itemInfo.recoveryCount, itemInfo.recoveryTime);
     }
   };
