@@ -84,13 +84,17 @@ export default class extends Phaser.Scene {
     });
     this.add.existing(this.player);
 
-    this.hpPotion = new Item({
-      scene: this,
-      x: CELL_SIZE * 1.5,
-      y: CELL_SIZE * 8.5,
-      itemInfo: this.inventory.itemsInfo[0],
-      onClick: this.onPotionClick
-    });
+    const hpPotion = this.inventory.itemsInfo.find(i => i.resource == "health");
+
+    if (hpPotion) {
+      this.hpPotion = new Item({
+        scene: this,
+        x: CELL_SIZE * 1.5,
+        y: CELL_SIZE * 8.5,
+        itemInfo: hpPotion,
+        onClick: this.onPotionClick
+      });
+    }
   }
 
   update(time, delta) {

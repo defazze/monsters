@@ -85,7 +85,6 @@ export default class extends Phaser.GameObjects.Container {
   }
 
   fill(itemsInfo, onClick = null) {
-    const result = [];
     itemsInfo.forEach(i => {
       const x = this.getItemX(i.columnIndex);
       const y = this.getItemY(i.rowIndex);
@@ -100,11 +99,7 @@ export default class extends Phaser.GameObjects.Container {
       if (this.isDraggable) {
         this.scene.input.setDraggable(item);
       }
-
-      result.push(item);
     });
-
-    return result;
   }
 
   getItemX(columnIndex) {

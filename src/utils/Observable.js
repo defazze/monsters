@@ -8,9 +8,17 @@ class proxyObject {
     this.middlewares.push(callback);
   };
 
+  unsubscribe = () => callback => {
+    this.middlewares = this.middlewares.filter(c => c != callback);
+  };
+
   get(target, prop) {
     if (prop == "subscribe") {
       return this.subscribe();
+    }
+
+    if (prop == "unsubscribe") {
+      return this.unsubscribe();
     }
     return target[prop];
   }

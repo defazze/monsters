@@ -48,11 +48,30 @@ export default class extends Phaser.Scene {
     });
     this.add.existing(traderContainer);
 
-    playerContainer.fill(inventory.Items);
-
-    traderContainer.fill(traderInventory.Items, item => {
+    const onTraderItemClick = item => {
       inventory.add(item.itemInfo);
       traderInventory.remove(item.itemInfo);
+    };
+
+    const onPlayerItemClick = item => {
+      inventory.remove(item.itemInfo);
+      traderInventory.add(item.itemInfo);
+    };
+
+    playerContainer.fill(inventory.Items, onPlayerItemClick);
+    traderContainer.fill(traderInventory.Items, onTraderItemClick);
+
+    const inventoryOnAddCallback = i =>
+      playerContainer.fill([i], onPlayerItemClick);
+    const traderOnAddCallback = i =>
+      traderContainer.fill([i], onTraderItemClick);
+
+    inventory.emitter.on("onAddNew", inventoryOnAddCallback);
+    traderInventory.emitter.on("onAddNew", traderOnAddCallback);
+
+    this.events.on("shutdown", () => {
+      inventory.emitter.off("onAddNew", inventoryOnAddCallback);
+      traderInventory.emitter.off("onAddNew", traderOnAddCallback);
     });
   }
 }

@@ -3,6 +3,8 @@ import { observable } from "../utils/Observable";
 
 export default class {
   constructor({ rowsCount, columnsCount }) {
+    this.emitter = new Phaser.Events.EventEmitter();
+
     this.rowsCount = rowsCount;
     this.columnsCount = columnsCount;
     this.itemsInfo = [];
@@ -24,6 +26,7 @@ export default class {
 
       this.inventory[itemInfo.rowIndex][itemInfo.columnIndex] = itemInfo;
       this.Items.push(itemInfo);
+      this.emitter.emit("onAddNew", itemInfo);
     };
 
     if (itemInfo.stackable) {
