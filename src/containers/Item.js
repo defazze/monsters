@@ -4,6 +4,12 @@ export default class extends Phaser.GameObjects.Container {
   constructor({ scene, x, y, itemInfo, onClick }) {
     super(scene, x, y);
 
+    itemInfo.subscribe(change => {
+      if (change.prop == "count") {
+        this.refresh();
+      }
+    });
+
     this.itemInfo = itemInfo;
     this.image = scene.add.image(0, 0, itemInfo.asset);
 
@@ -14,9 +20,9 @@ export default class extends Phaser.GameObjects.Container {
         color: "#0f0f0f"
       });
     }
+    this.count.x = 24 - this.count.width;
+    this.count.y = 24 - this.count.height;
 
-    this.count.x += 24 - this.count.width;
-    this.count.y += 24 - this.count.height;
     this.add([this.image, this.count]);
     this.setSize(this.image.width, this.image.height);
     this.setInteractive();
@@ -26,14 +32,18 @@ export default class extends Phaser.GameObjects.Container {
     this.scene.add.existing(this);
   }
 
-  refresh() {
-    if (this.itemInfo.stackable) {
-      const { count } = this.itemInfo;
-      if (count == 0) {
-        this.destroy();
-      } else {
-        this.count.text = count;
+  refresh = () => {
+    if (this.scene) {
+      if (this.itemInfo.stackable) {
+        const { count } = this.itemInfo;
+        if (count == 0) {
+          this.destroy();
+        } else {
+          this.count.text = count;
+          this.count.x = 24 - this.count.width;
+          this.count.y = 24 - this.count.height;
+        }
       }
     }
-  }
+  };
 }

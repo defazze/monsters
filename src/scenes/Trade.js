@@ -48,7 +48,11 @@ export default class extends Phaser.Scene {
     });
     this.add.existing(traderContainer);
 
-    traderContainer.fill(traderInventory.Items);
-    playerContainer.fill(inventory.Items);
+    const playerItems = playerContainer.fill(inventory.Items);
+
+    traderContainer.fill(traderInventory.Items, item => {
+      inventory.add(item.itemInfo);
+      traderInventory.remove(item.itemInfo);
+    });
   }
 }

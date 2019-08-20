@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-
 export default class {
   constructor({ rowsCount, columnsCount }) {
     this.rowsCount = rowsCount;
@@ -10,9 +9,32 @@ export default class {
     );
   }
 
-  add(itemInfo, count = 1) {
+  add = (itemInfo, count = 1) => {
     const addNewItem = () => {
-      itemInfo = { ...itemInfo };
+      itemInfo = new Proxy(
+        {
+          ...itemInfo,
+          middlewares: [],
+          count: 0
+        },
+        {
+          subscribe: target => callback => {
+            target.middlewares.push(callback);
+          },
+          get(target, prop) {
+            if (prop == "subscribe") {
+              return this.subscribe(target);
+            }
+            return target[prop];
+          },
+          set(target, prop, val) {
+            target[prop] = val;
+            target.middlewares.forEach(m => m({ prop, val }));
+            return true;
+          }
+        }
+      );
+
       const emptyCell = this.getFirstEmptyCell();
       itemInfo.rowIndex = emptyCell.rowIndex;
       itemInfo.columnIndex = emptyCell.columnIndex;
@@ -32,9 +54,9 @@ export default class {
     } else {
       addNewItem();
     }
-  }
+  };
 
-  remove(itemInfo) {
+  remove = itemInfo => {
     const removeItem = () => {
       Phaser.Utils.Array.Remove(this.Items, itemInfo);
       this.inventory[itemInfo.rowIndex][itemInfo.columnIndex] = null;
@@ -49,16 +71,16 @@ export default class {
     } else {
       removeItem();
     }
-  }
+  };
 
-  moveTo(itemInfo, rowIndex, columnIndex) {
+  moveTo = (itemInfo, rowIndex, columnIndex) => {
     this.inventory[itemInfo.rowIndex][itemInfo.columnIndex] = null;
     this.inventory[rowIndex][columnIndex] = itemInfo;
     itemInfo.rowIndex = rowIndex;
     itemInfo.columnIndex = columnIndex;
-  }
+  };
 
-  getFirstEmptyCell() {
+  getFirstEmptyCell = () => {
     for (var i = 0; i < this.rowsCount; i++) {
       for (var j = 0; j < this.columnsCount; j++) {
         if (!this.inventory[i][j]) {
@@ -68,11 +90,11 @@ export default class {
     }
 
     return null;
-  }
+  };
 
-  findStackableItem(itemInfo) {
+  findStackableItem = itemInfo => {
     if (itemInfo.type == "potion") {
-      const existingItem = this.Items.find(
+      const existingItem = this.itemsInfo.find(
         i => i.grade == itemInfo.grade && i.resource == itemInfo.resource
       );
 
@@ -80,7 +102,7 @@ export default class {
     }
 
     return null;
-  }
+  };
 
   get Items() {
     return this.itemsInfo;

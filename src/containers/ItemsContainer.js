@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { CELL_SIZE, BORDER_WIDTH } from "../constants/inventory";
 import Item from "../containers/Item";
 
+const CELL_COLOR = 0xd2c1c6; /*0x8383838*/
 export default class extends Phaser.GameObjects.Container {
   constructor({
     scene,
@@ -38,7 +39,7 @@ export default class extends Phaser.GameObjects.Container {
         const x = cellSize * (i + 0.5) + borderWidth * (i + 1);
         const y = cellSize * (j + 0.5) + borderWidth * (j + 1);
 
-        const cell = scene.add.rectangle(x, y, cellSize, cellSize, 0x838383);
+        const cell = scene.add.rectangle(x, y, cellSize, cellSize, CELL_COLOR);
 
         cell.setInteractive(undefined, undefined, isDraggable);
 
@@ -60,7 +61,7 @@ export default class extends Phaser.GameObjects.Container {
       });
 
       scene.input.on("dragleave", (pointer, gameObject, dropZone) => {
-        dropZone.setFillStyle(0x838383, 1);
+        dropZone.setFillStyle(CELL_COLOR, 1);
       });
 
       scene.input.on("drop", (pointer, gameObject, dropZone) => {
@@ -71,7 +72,7 @@ export default class extends Phaser.GameObjects.Container {
           onDrop(gameObject, dropZone);
         }
 
-        dropZone.setFillStyle(0x838383, 1);
+        dropZone.setFillStyle(CELL_COLOR, 1);
       });
 
       scene.input.on("dragend", (pointer, gameObject, dropped) => {
@@ -83,16 +84,27 @@ export default class extends Phaser.GameObjects.Container {
     }
   }
 
-  fill(itemsInfo) {
+  fill(itemsInfo, onClick = null) {
+    const result = [];
     itemsInfo.forEach(i => {
       const x = this.getItemX(i.columnIndex);
       const y = this.getItemY(i.rowIndex);
-      const item = new Item({ scene: this.scene, x, y, itemInfo: i });
+      const item = new Item({
+        scene: this.scene,
+        x,
+        y,
+        itemInfo: i,
+        onClick: onClick
+      });
 
       if (this.isDraggable) {
         this.scene.input.setDraggable(item);
       }
+
+      result.push(item);
     });
+
+    return result;
   }
 
   getItemX(columnIndex) {
