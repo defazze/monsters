@@ -11,6 +11,7 @@ export default class extends Phaser.GameObjects.Container {
     rows,
     columns,
     onDrop,
+    onItemClick,
     cellSize = CELL_SIZE,
     borderWidth = BORDER_WIDTH,
     isDraggable = true
@@ -21,6 +22,7 @@ export default class extends Phaser.GameObjects.Container {
     this.isDraggable = isDraggable;
     this.borderWidth = borderWidth;
     this.cellSize = cellSize;
+    this.onItemClick = onItemClick;
 
     const backgroundWidth = columns * cellSize + (columns + 1) * borderWidth;
     const backgroundHeight = rows * cellSize + (rows + 1) * borderWidth;
@@ -72,6 +74,13 @@ export default class extends Phaser.GameObjects.Container {
           onDrop(gameObject, dropZone);
         }
 
+        this.emitter.emit(
+          "onDrop",
+          gameObject.itemInfo,
+          dropZone.rowIndex,
+          dropZone.columnIndex
+        );
+
         dropZone.setFillStyle(CELL_COLOR, 1);
       });
 
@@ -84,7 +93,13 @@ export default class extends Phaser.GameObjects.Container {
     }
   }
 
-  fill(itemsInfo, onClick = null) {
+  items = [];
+  emitter = new Phaser.Events.EventEmitter();
+
+  addItems = itemsInfo => {
+    if (!Array.isArray(itemsInfo)) {
+      itemsInfo = [itemsInfo];
+    }
     itemsInfo.forEach(i => {
       const x = this.getItemX(i.columnIndex);
       const y = this.getItemY(i.rowIndex);
@@ -93,28 +108,30 @@ export default class extends Phaser.GameObjects.Container {
         x,
         y,
         itemInfo: i,
-        onClick: onClick
+        onClick: this.onItemClick
       });
 
       if (this.isDraggable) {
         this.scene.input.setDraggable(item);
       }
-    });
-  }
 
-  getItemX(columnIndex) {
+      this.items.push(item);
+    });
+  };
+
+  getItemX = columnIndex => {
     return (
       this.x +
       this.borderWidth * (columnIndex + 1) +
       this.cellSize * (columnIndex + 0.5)
     );
-  }
+  };
 
-  getItemY(rowIndex) {
+  getItemY = rowIndex => {
     return (
       this.y +
       this.borderWidth * (rowIndex + 1) +
       this.cellSize * (rowIndex + 0.5)
     );
-  }
+  };
 }

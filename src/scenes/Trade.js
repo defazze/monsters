@@ -22,32 +22,6 @@ export default class extends Phaser.Scene {
       this.scene.start("CastleScene");
     });
 
-    const playerContainer = new ItemsContainer({
-      scene: this,
-      x: X,
-      y: 500,
-      rows: inventory.rowsCount,
-      columns: inventory.columnsCount,
-      onDrop: (gameObject, dropZone) => {
-        inventory.moveTo(
-          gameObject.itemInfo,
-          dropZone.rowIndex,
-          dropZone.columnIndex
-        );
-      }
-    });
-    this.add.existing(playerContainer);
-
-    const traderContainer = new ItemsContainer({
-      scene: this,
-      x: X,
-      y: 150,
-      rows: traderInventory.rowsCount,
-      columns: traderInventory.columnsCount,
-      isDraggable: false
-    });
-    this.add.existing(traderContainer);
-
     const onTraderItemClick = item => {
       inventory.add(item.itemInfo);
       traderInventory.remove(item.itemInfo);
@@ -58,20 +32,33 @@ export default class extends Phaser.Scene {
       traderInventory.add(item.itemInfo);
     };
 
-    playerContainer.fill(inventory.Items, onPlayerItemClick);
-    traderContainer.fill(traderInventory.Items, onTraderItemClick);
+    const playerContainer = new ItemsContainer({
+      scene: this,
+      x: X,
+      y: 500,
+      rows: inventory.rowsCount,
+      columns: inventory.columnsCount,
+      onItemClick: onPlayerItemClick
+    });
+    this.add.existing(playerContainer);
 
-    const inventoryOnAddCallback = i =>
-      playerContainer.fill([i], onPlayerItemClick);
-    const traderOnAddCallback = i =>
-      traderContainer.fill([i], onTraderItemClick);
+    const traderContainer = new ItemsContainer({
+      scene: this,
+      x: X,
+      y: 150,
+      rows: traderInventory.rowsCount,
+      columns: traderInventory.columnsCount,
+      onItemClick: onTraderItemClick,
+      isDraggable: false
+    });
+    this.add.existing(traderContainer);
 
-    inventory.emitter.on("onAddNew", inventoryOnAddCallback);
-    traderInventory.emitter.on("onAddNew", traderOnAddCallback);
+    inventory.addContainer(playerContainer);
+    traderInventory.addContainer(traderContainer);
 
     this.events.on("shutdown", () => {
-      inventory.emitter.off("onAddNew", inventoryOnAddCallback);
-      traderInventory.emitter.off("onAddNew", traderOnAddCallback);
+      inventory.removeContainer(playerContainer);
+      traderInventory.removeContainer(traderContainer);
     });
   }
 }

@@ -27,7 +27,7 @@ export default class extends Phaser.GameObjects.Container {
     this.setSize(this.image.width, this.image.height);
     this.setInteractive();
     if (onClick) {
-      this.on("pointerdown", () => onClick(this));
+      this.on("pointerup", () => onClick(this));
     }
     this.scene.add.existing(this);
   }

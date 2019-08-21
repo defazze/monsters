@@ -30,17 +30,14 @@ export default class extends Phaser.Scene {
       x: X,
       y: Y,
       rows: inventory.rowsCount,
-      columns: inventory.columnsCount,
-      onDrop: (gameObject, dropZone) => {
-        inventory.moveTo(
-          gameObject.itemInfo,
-          dropZone.rowIndex,
-          dropZone.columnIndex
-        );
-      }
+      columns: inventory.columnsCount
     });
 
     this.add.existing(itemsContainer);
-    itemsContainer.fill(inventory.Items);
+    inventory.addContainer(itemsContainer);
+
+    this.events.on("shutdown", () => {
+      inventory.removeContainer(itemsContainer);
+    });
   }
 }

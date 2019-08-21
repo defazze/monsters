@@ -3,15 +3,26 @@ import { observable } from "../utils/Observable";
 
 export default class {
   constructor({ rowsCount, columnsCount }) {
-    this.emitter = new Phaser.Events.EventEmitter();
-
     this.rowsCount = rowsCount;
     this.columnsCount = columnsCount;
-    this.itemsInfo = [];
     this.inventory = new Array(rowsCount).fill(
       new Array(columnsCount).fill(null)
     );
   }
+
+  itemsInfo = [];
+  containers = [];
+
+  addContainer = container => {
+    this.containers.push(container);
+    container.addItems(this.itemsInfo);
+    container.emitter.on("onDrop", this.moveTo);
+  };
+
+  removeContainer = container => {
+    this.containers = this.containers.filter(c => c != container);
+    container.emitter.off("onDrop", this.moveTo);
+  };
 
   add = (itemInfo, count = 1) => {
     const addNewItem = () => {
@@ -26,7 +37,7 @@ export default class {
 
       this.inventory[itemInfo.rowIndex][itemInfo.columnIndex] = itemInfo;
       this.Items.push(itemInfo);
-      this.emitter.emit("onAddNew", itemInfo);
+      this.containers.forEach(c => c.addItems(itemInfo));
     };
 
     if (itemInfo.stackable) {
