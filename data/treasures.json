@@ -1,0 +1,13 @@
+[
+  {
+    "name": "tutorial",
+    "noDrop": 100,
+    "gold": 15,
+    "potion0": 15
+  },
+  {
+    "name": "potion0",
+    "hpPotion0": 7,
+    "manaPotion0": 3
+  }
+]

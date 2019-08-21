@@ -1,5 +1,6 @@
 [
   {
+    "code": "hpPotion0",
     "type": "potion",
     "resource": "health",
     "grade": 0,
@@ -9,6 +10,7 @@
     "stackable": true
   },
   {
+    "code": "manaPotion0",
     "type": "potion",
     "resource": "mana",
     "grade": 0,
