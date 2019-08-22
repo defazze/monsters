@@ -41,7 +41,7 @@ export default class extends Phaser.Scene {
     this.background = this.add.tileSprite(
       CELL_SIZE + (CELL_SIZE * 9) / 2,
       CELL_SIZE + (CELL_SIZE * 7) / 2,
-      CELL_SIZE * 9,
+      CELL_SIZE * 11,
       CELL_SIZE * 7,
       "grass"
     );
@@ -62,10 +62,6 @@ export default class extends Phaser.Scene {
     this.setHeader(1);
 
     this.input.keyboard.on("keydown", this.onKeyPressed);
-
-    const graphics = this.add.graphics();
-    graphics.lineStyle(3, 0x0f0f0f);
-    graphics.strokeRect(CELL_SIZE, CELL_SIZE, CELL_SIZE * 9, CELL_SIZE * 7);
 
     this.battlefield = new Battlefield();
     this.generator = new Generator(this.battlefield);
@@ -212,7 +208,7 @@ export default class extends Phaser.Scene {
     this.monsters = monstersInfo.map(monsterInfo => {
       const monster = new Monster({
         scene: this,
-        x: monsterInfo.coords.x,
+        x: monsterInfo.coords.x + 5 * CELL_SIZE,
         y: monsterInfo.coords.y,
         monsterInfo: monsterInfo,
         health: monsterInfo.health,
@@ -225,6 +221,22 @@ export default class extends Phaser.Scene {
 
       this.add.existing(monster);
       return monster;
+    });
+
+    this.monsters.forEach(m =>
+      this.tweens.add({
+        targets: m,
+        x: m.monsterInfo.coords.x,
+        ease: "Sine.easeInOut",
+        duration: 2000
+      })
+    );
+
+    this.tweens.add({
+      targets: this.background,
+      tilePositionX: this.background.tilePositionX + 5 * CELL_SIZE,
+      ease: "Sine.easeInOut",
+      duration: 2000
     });
   }
 }
