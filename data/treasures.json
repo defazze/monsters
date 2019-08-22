@@ -1,13 +1,19 @@
 [
   {
     "name": "tutorial",
-    "noDrop": 100,
-    "gold": 15,
-    "potion0": 15
+    "drops": ["noDrop", "gold", "potion0"],
+    "probs": [100, 30, 15]
+  },
+  {
+    "name": "tutorial chest",
+    "picks": 2,
+    "drops": ["noDrop", "gold", "potion0"],
+    "probs": [100, 15, 5],
+    "goldRate": 2
   },
   {
     "name": "potion0",
-    "hpPotion0": 7,
-    "manaPotion0": 3
+    "drops": ["hpPotion0", "manaPotion0"],
+    "probs": [7, 3]
   }
 ]

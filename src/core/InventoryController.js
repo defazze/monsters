@@ -10,6 +10,7 @@ export default class {
     );
   }
 
+  gold = observable({ count: 0 });
   itemsInfo = [];
   containers = [];
 
@@ -69,6 +70,14 @@ export default class {
       removeItem();
     }
   };
+
+  addGold(gold) {
+    this.gold.count += gold;
+  }
+
+  removeGold(gold) {
+    this.gold.count -= gold;
+  }
 
   moveTo = (itemInfo, rowIndex, columnIndex) => {
     this.inventory[itemInfo.rowIndex][itemInfo.columnIndex] = null;

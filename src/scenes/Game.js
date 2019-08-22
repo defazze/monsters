@@ -5,10 +5,16 @@ import { Monster } from "../containers/Monster";
 import Generator from "../core/MonsterGenerator";
 import Builder from "../core/PlayerBuilder";
 import Calculator from "../core/DamageCalculator";
+
 import { CELL_SIZE, SPAWN_DELAY } from "../constants/common";
+import { DROP, GOLD } from "../constants/drop";
+
 import { Player } from "../containers/Player";
 import Battlefield from "../core/FieldController.js";
 import Item from "../containers/Item";
+import Gold from "../containers/Gold";
+import DropController from "../core/DropController";
+import DropAnimator from "../utils/DropAnimator";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -23,6 +29,9 @@ export default class extends Phaser.Scene {
 
   create() {
     this.inventory = this.customData.inventory;
+    const { treasures, items } = this.customData;
+    this.dropController = new DropController(treasures, items);
+    this.dropAnimator = new DropAnimator(this);
 
     this.spawnTime = 0;
     this.spawnDelayRun = false;
@@ -36,14 +45,6 @@ export default class extends Phaser.Scene {
       CELL_SIZE * 7,
       "grass"
     );
-
-    this.anims.create({
-      key: "flip",
-      frames: this.anims.generateFrameNumbers("coin"),
-      frameRate: 30,
-      repeat: 1,
-      hideOnComplete: true
-    });
 
     const castleIcon = this.add.sprite(150, 50, "castle").setInteractive();
     castleIcon.on("pointerdown", () =>
@@ -83,6 +84,13 @@ export default class extends Phaser.Scene {
       onDead: this.onPlayerDead
     });
     this.add.existing(this.player);
+
+    const gold = new Gold({
+      scene: this,
+      x: 700,
+      y: 50,
+      goldObject: this.inventory.gold
+    });
 
     const hpPotion = this.inventory.itemsInfo.find(i => i.resource == "health");
 
@@ -127,10 +135,14 @@ export default class extends Phaser.Scene {
   onMonsterDead = monster => {
     const { monsterInfo } = monster;
 
+    const drops = this.dropController.calculate(monsterInfo);
+    this.dropAnimator.animate(drops, monster.x, monster.y);
+    drops.forEach(d =>
+      d.code == GOLD ? this.inventory.addGold(d.count) : this.inventory.add(d)
+    );
+
     monster.destroy();
     this.battlefield.removeMonster(monsterInfo.lineIndex, monsterInfo.rowIndex);
-
-    this.coinAnimate(monster);
 
     if (this.battlefield.isEmpty(monsterInfo.lineIndex)) {
       const monsters = this.monsters.filter(
@@ -213,26 +225,6 @@ export default class extends Phaser.Scene {
 
       this.add.existing(monster);
       return monster;
-    });
-  }
-
-  coinAnimate(monster) {
-    const coin = this.add.sprite(
-      monster.x + CELL_SIZE / 2,
-      monster.y + CELL_SIZE / 2,
-      "coin"
-    );
-    coin.anims.play("flip");
-    coin.once("animationcomplete", () => {
-      coin.destroy();
-    });
-
-    this.tweens.add({
-      targets: coin,
-      y: monster.y + CELL_SIZE / 2 - 30,
-      /*alpha: 0.5,*/
-      ease: "Sine.easeInOut",
-      duration: 400
     });
   }
 }

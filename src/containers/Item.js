@@ -4,11 +4,13 @@ export default class extends Phaser.GameObjects.Container {
   constructor({ scene, x, y, itemInfo, onClick }) {
     super(scene, x, y);
 
-    itemInfo.subscribe(change => {
+    const callback = change => {
       if (change.prop == "count") {
         this.refresh();
       }
-    });
+    };
+    itemInfo.subscribe(callback);
+    scene.events.on("shutdown", () => itemInfo.unsubscribe(callback));
 
     this.itemInfo = itemInfo;
     this.image = scene.add.image(0, 0, itemInfo.asset);
@@ -33,16 +35,14 @@ export default class extends Phaser.GameObjects.Container {
   }
 
   refresh = () => {
-    if (this.scene) {
-      if (this.itemInfo.stackable) {
-        const { count } = this.itemInfo;
-        if (count == 0) {
-          this.destroy();
-        } else {
-          this.count.text = count;
-          this.count.x = 24 - this.count.width;
-          this.count.y = 24 - this.count.height;
-        }
+    if (this.itemInfo.stackable) {
+      const { count } = this.itemInfo;
+      if (count == 0) {
+        this.destroy();
+      } else {
+        this.count.text = count;
+        this.count.x = 24 - this.count.width;
+        this.count.y = 24 - this.count.height;
       }
     }
   };
