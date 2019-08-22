@@ -28,7 +28,6 @@ export class Monster extends Actor {
     this.battlefield = battlefield;
     this.scene = scene;
     this.monsterInfo = monsterInfo;
-    this.lastAttackTime = 0;
     this.onAttack = onAttack;
     this.player = player;
 
@@ -39,74 +38,70 @@ export class Monster extends Actor {
     });
 
     this.on("pointerdown", () => onClick(this));
+    this.on("destroy", this.onDestroy);
+
+    scene.time.delayedCall(500, this.onTimerStart);
   }
 
-  update(time, delta) {
-    super.update(time, delta);
+  onTimerStart = () => {
+    const { attackInterval = 1000 } = this.monsterInfo;
+    this.timer = this.scene.time.addEvent({
+      delay: attackInterval,
+      callback: this.attack,
+      callbackScope: this,
+      loop: true
+    });
+  };
 
-    if (!this.isDead) {
-      if (!this.monsterInfo.attackInterval) {
-        this.monsterInfo.attackInterval = 1000;
-      }
+  attack = () => {
+    const lineDistance = Math.abs(
+      this.monsterInfo.lineIndex - this.player.playerInfo.lineIndex
+    );
 
-      /*
-      if (this.lastAttackTime == 0) {
-        this.lastAttackTime = time + this.monsterInfo.attackInterval/2;
-      }*/
-      const lineDistance = Math.abs(
-        this.monsterInfo.lineIndex - this.player.playerInfo.lineIndex
+    if (this.monsterInfo.isRanged && lineDistance > 1) {
+      const start = {
+        x: this.x,
+        y: this.y + CELL_SIZE / 2
+      };
+      const end = {
+        x: this.player.x + CELL_SIZE / 2,
+        y: this.player.y + CELL_SIZE / 2
+      };
+      const arrow = this.scene.physics.add.sprite(start.x, start.y, "arrow");
+      const angle = Phaser.Math.Angle.Between(end.x, end.y, start.x, start.y);
+      const distance = Phaser.Math.Distance.Between(
+        end.x,
+        end.y,
+        start.x,
+        start.y
       );
-      if (time > this.lastAttackTime + this.monsterInfo.attackInterval) {
-        if (this.monsterInfo.isRanged && lineDistance > 1) {
-          const start = {
-            x: this.x,
-            y: this.y + CELL_SIZE / 2
-          };
-          const end = {
-            x: this.player.x + CELL_SIZE / 2,
-            y: this.player.y + CELL_SIZE / 2
-          };
-          const arrow = this.scene.physics.add.sprite(
-            start.x,
-            start.y,
-            "arrow"
-          );
-          const angle = Phaser.Math.Angle.Between(
-            end.x,
-            end.y,
-            start.x,
-            start.y
-          );
-          const distance = Phaser.Math.Distance.Between(
-            end.x,
-            end.y,
-            start.x,
-            start.y
-          );
-          const speed = 0.2;
-          arrow.rotation = angle;
+      const speed = 0.2;
+      arrow.rotation = angle;
 
-          this.scene.tweens.add({
-            targets: arrow,
-            x: end.x,
-            y: end.y,
-            duration: distance / speed
-          });
+      this.scene.tweens.add({
+        targets: arrow,
+        x: end.x,
+        y: end.y,
+        duration: distance / speed
+      });
 
-          this.scene.physics.add.overlap(
-            this.player.sprite,
-            arrow,
-            this.onRangeHit,
-            null,
-            this
-          );
-        } else {
-          this.onAttack(this);
-        }
-        this.lastAttackTime = time;
-      }
+      this.scene.physics.add.overlap(
+        this.player.sprite,
+        arrow,
+        this.onRangeHit,
+        null,
+        this
+      );
+    } else {
+      this.onAttack(this);
     }
-  }
+  };
+
+  onDestroy = () => {
+    if (this.timer) {
+      this.timer.remove();
+    }
+  };
 
   moveForward() {
     this.battlefield.setCell(
