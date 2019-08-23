@@ -11,6 +11,7 @@ export default class {
     this.clear();
   }
 
+  monsters = [];
   clear() {
     this.lines = [
       [null, null, null, null, null, null, null],
@@ -67,17 +68,29 @@ export default class {
   }
 
   removeMonster(lineIndex, rowIndex) {
+    this.monsters = this.monsters.filter(
+      m => m.lineIndex == lineIndex && m.rowIndex == rowIndex
+    );
     this.lines[lineIndex][rowIndex] = null;
   }
 
   setMonster(monsterInfo) {
-    const enableLines = this.setLinesStatus();
+    const getMonstersCount = lineIndex =>
+      this.monsters.filter(m => m.lineIndex == lineIndex).length;
 
-    let priorityLines = monsterInfo.priorityLines
-      ? monsterInfo.priorityLines
-      : [4, 5, 6, 7];
+    const enableLines = [4, 5, 6, 7].filter(i => {
+      const count = getMonstersCount(i);
+      return count > 0 && count < 7;
+    });
 
-    priorityLines = priorityLines.filter(l => enableLines.some(a => a == l));
+    const firstEmpty = [4, 5, 6, 7].find(i => getMonstersCount(i) == 0);
+    if (firstEmpty) {
+      enableLines.push(firstEmpty);
+    }
+
+    const priorityLines = (monsterInfo.priorityLines || [4, 5, 6, 7]).filter(
+      l => enableLines.some(a => a == l)
+    );
 
     let monsterLineIndex = this.getLineByPriority(priorityLines);
 
@@ -98,6 +111,8 @@ export default class {
 
     monsterInfo.lineIndex = monsterLineIndex;
     monsterInfo.rowIndex = monsterRowIndex;
+
+    this.monsters.push(monsterInfo);
 
     return {
       x: (monsterLineIndex + 2) * CELL_SIZE,
