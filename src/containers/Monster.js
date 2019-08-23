@@ -104,19 +104,7 @@ export class Monster extends Actor {
   };
 
   moveForward() {
-    this.battlefield.setCell(
-      this.monsterInfo.lineIndex,
-      this.monsterInfo.rowIndex,
-      null
-    );
-
     this.monsterInfo.lineIndex--;
-    this.battlefield.setCell(
-      this.monsterInfo.lineIndex,
-      this.monsterInfo.rowIndex,
-      this.monsterInfo
-    );
-
     this.scene.tweens.add({
       targets: this,
       x: this.x - CELL_SIZE,
