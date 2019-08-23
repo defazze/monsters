@@ -29,6 +29,20 @@ export default class extends Phaser.Scene {
   preload() {}
 
   create() {
+    this.anims.create({
+      key: "knight-idle",
+      frames: this.anims.generateFrameNumbers("knight-idle"),
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: "knight-attack",
+      frames: this.anims.generateFrameNumbers("knight-attack"),
+      frameRate: 10,
+      repeat: 0
+    });
+
     this.inventory = this.gameData.inventory;
     const { treasures, items } = this.gameData;
     this.dropController = new DropController(treasures, items);
@@ -77,6 +91,7 @@ export default class extends Phaser.Scene {
       onDead: this.onPlayerDead
     });
     this.add.existing(this.player);
+    this.player.play("knight-idle");
 
     const gold = new Gold({
       scene: this,
@@ -121,6 +136,7 @@ export default class extends Phaser.Scene {
   }
 
   onMonsterClick = monster => {
+    this.player.play("knight-attack");
     const { monsterInfo } = monster;
     const damage = this.сalculator.toMonster(this.playerInfo, monsterInfo);
     monster.hit(damage);

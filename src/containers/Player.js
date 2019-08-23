@@ -8,11 +8,18 @@ export class Player extends Actor {
       x,
       y,
       health: playerInfo.health,
-      asset: "hero",
-      name: "Hero",
+      asset: "knight-idle",
+      name: "Knight",
       onDead
     });
 
     this.playerInfo = playerInfo;
+  }
+
+  play(key) {
+    this.sprite.play(key);
+    if (key == "knight-attack") {
+      this.sprite.anims.chain("knight-idle");
+    }
   }
 }

@@ -36,6 +36,22 @@ export default class extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16
     });
+    this.load.spritesheet("knight-idle", "assets/images/knight_idle.png", {
+      frameWidth: 45,
+      frameHeight: 64
+    });
+    this.load.spritesheet("knight-attack", "assets/images/knight-attack.png", {
+      frameWidth: 124,
+      frameHeight: 64
+    });
+    this.load.spritesheet("knight-walk", "assets/images/knight_walk.png", {
+      frameWidth: 51,
+      frameHeight: 64
+    });
+    this.load.spritesheet("knight-hurt", "assets/images/knight_hurt.png", {
+      frameWidth: 51,
+      frameHeight: 64
+    });
   }
 
   create() {
