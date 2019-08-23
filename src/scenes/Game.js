@@ -3,18 +3,19 @@ import Phaser from "phaser";
 
 import { Monster } from "../containers/Monster";
 import Generator from "../core/MonsterGenerator";
-import Builder from "../core/PlayerBuilder";
 import Calculator from "../core/DamageCalculator";
 
 import { CELL_SIZE, SPAWN_DELAY } from "../constants/common";
-import { DROP, GOLD } from "../constants/drop";
+import { GOLD } from "../constants/drop";
 
 import { Player } from "../containers/Player";
 import Battlefield from "../core/FieldController.js";
-import Item from "../containers/Item";
 import Gold from "../containers/Gold";
 import DropController from "../core/DropController";
 import DropAnimator from "../utils/DropAnimator";
+import BoundContainer from "../containers/items/BoundContainer";
+
+import Zones from "../../data/zones.json";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -22,14 +23,14 @@ export default class extends Phaser.Scene {
   }
 
   init(data) {
-    this.customData = data;
+    this.gameData = data;
   }
 
   preload() {}
 
   create() {
-    this.inventory = this.customData.inventory;
-    const { treasures, items } = this.customData;
+    this.inventory = this.gameData.inventory;
+    const { treasures, items } = this.gameData;
     this.dropController = new DropController(treasures, items);
     this.dropAnimator = new DropAnimator(this);
 
@@ -48,7 +49,7 @@ export default class extends Phaser.Scene {
 
     const castleIcon = this.add.sprite(150, 50, "castle").setInteractive();
     castleIcon.on("pointerdown", () =>
-      this.scene.start("CastleScene", this.customData)
+      this.scene.start("CastleScene", this.gameData)
     );
 
     const inventoryIcon = this.add
@@ -56,22 +57,18 @@ export default class extends Phaser.Scene {
       .setInteractive();
     inventoryIcon.on("pointerdown", () => {
       this.scene.sleep("GameScene");
-      this.scene.run("InventoryScene", this.customData);
+      this.scene.run("InventoryScene", this.gameData);
     });
-
-    this.setHeader(1);
 
     this.input.keyboard.on("keydown", this.onKeyPressed);
 
     this.battlefield = new Battlefield();
     this.generator = new Generator(this.battlefield);
     this.сalculator = new Calculator();
-    this.builder = new Builder();
 
-    this.wave = 1;
     this.mustSpawn = true;
 
-    this.playerInfo = this.builder.build();
+    this.playerInfo = this.gameData.playerInfo;
     this.player = new Player({
       scene: this,
       x: CELL_SIZE * 4,
@@ -88,17 +85,18 @@ export default class extends Phaser.Scene {
       goldObject: this.inventory.gold
     });
 
-    const hpPotion = this.inventory.itemsInfo.find(i => i.resource == "health");
-
-    if (hpPotion) {
-      this.hpPotion = new Item({
-        scene: this,
-        x: CELL_SIZE * 1.5,
-        y: CELL_SIZE * 8.5,
-        itemInfo: hpPotion,
-        onClick: this.onPotionClick
-      });
-    }
+    this.fastItems = new BoundContainer({
+      scene: this,
+      x: CELL_SIZE * 1,
+      y: CELL_SIZE * 8.25,
+      onItemClick: this.onPotionClick,
+      boundItemsTypes: ["hpPotion0", "manaPotion0"]
+    });
+    this.add.existing(this.fastItems);
+    this.inventory.addContainer(this.fastItems);
+    this.events.on("shutdown", () => {
+      this.inventory.removeContainer(this.fastItems);
+    });
   }
 
   update(time, delta) {
@@ -130,7 +128,7 @@ export default class extends Phaser.Scene {
 
   onMonsterDead = monster => {
     const { monsterInfo } = monster;
-
+    const { lineIndex } = monsterInfo;
     const drops = this.dropController.calculate(monsterInfo);
     this.dropAnimator.animate(drops, monster.x, monster.y);
     drops.forEach(d =>
@@ -138,15 +136,15 @@ export default class extends Phaser.Scene {
     );
 
     monster.destroy();
-    this.battlefield.removeMonster(monsterInfo.lineIndex, monsterInfo.rowIndex);
+    this.battlefield.removeMonster(lineIndex, monsterInfo.rowIndex);
 
-    if (this.battlefield.isEmpty(monsterInfo.lineIndex)) {
+    if (this.battlefield.isEmpty(lineIndex)) {
       const monsters = this.monsters.filter(
-        m => m.monsterInfo.lineIndex > monsterInfo.lineIndex && !m.isDead
+        m => m.monsterInfo.lineIndex > lineIndex && !m.isDead
       );
 
       monsters.forEach(m => m.moveForward());
-      if (monsters.some(m => !m.isDead)) {
+      if (lineIndex == 4 && this.monsters.some(m => !m.isDead)) {
         this.tweens.add({
           targets: this.background,
           tilePositionX: this.background.tilePositionX + CELL_SIZE,
@@ -157,12 +155,11 @@ export default class extends Phaser.Scene {
     }
 
     if (this.monsters.every(m => m.isDead || m.monsterInfo.isPermanent)) {
-      this.wave++;
-      if (this.wave > 10) {
+      this.gameData.currentWave++;
+      if (this.gameData.currentWave > Zones[0].min.length) {
         this.scene.start("WinScene");
       } else {
         this.mustSpawn = true;
-        this.setHeader(this.wave);
       }
     }
   };
@@ -186,24 +183,11 @@ export default class extends Phaser.Scene {
   };
 
   onKeyPressed = event => {
-    if (event.key == "1") {
-      this.onPotionClick(this.hpPotion);
-    }
+    this.fastItems.keyPress(event.key);
   };
 
-  setHeader(wave) {
-    if (this.header) {
-      this.header.destroy();
-    }
-
-    this.header = this.add.text(400, 10, "Wave " + wave, {
-      font: "64px Bangers",
-      fill: "#666666"
-    });
-  }
-
   monstersGenerate() {
-    const monstersInfo = this.generator.generate(this.wave);
+    const monstersInfo = this.generator.generate(this.gameData.currentWave);
 
     this.monsters = monstersInfo.map(monsterInfo => {
       const monster = new Monster({

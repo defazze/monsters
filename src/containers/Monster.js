@@ -12,7 +12,6 @@ export class Monster extends Actor {
     onDead,
     health,
     monsterInfo,
-    battlefield,
     player
   }) {
     super({
@@ -25,7 +24,6 @@ export class Monster extends Actor {
       onDead
     });
 
-    this.battlefield = battlefield;
     this.scene = scene;
     this.monsterInfo = monsterInfo;
     this.onAttack = onAttack;
@@ -105,6 +103,7 @@ export class Monster extends Actor {
 
   moveForward() {
     this.monsterInfo.lineIndex--;
+
     this.scene.tweens.add({
       targets: this,
       x: this.x - CELL_SIZE,

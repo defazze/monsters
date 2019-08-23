@@ -3,6 +3,7 @@ import InventoryController from "../core/InventoryController";
 import { INVENTORY_COLUMNS, INVENTORY_ROWS } from "../constants/inventory";
 import ItemsData from "../../data/items.json";
 import Treasures from "../../data/treasures.json";
+import Builder from "../core/PlayerBuilder";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -50,24 +51,25 @@ export default class extends Phaser.Scene {
       itemsData: ItemsData
     });
 
-    const hpPotion = ItemsData.find(
-      i => i.type == "potion" && i.resource == "health" && i.grade == 0
-    );
-    const manaPotion = ItemsData.find(
-      i => i.type == "potion" && i.resource == "mana" && i.grade == 0
-    );
+    const hpPotion = ItemsData.find(i => i.code == "hpPotion0");
+    const manaPotion = ItemsData.find(i => i.code == "manaPotion0");
 
     playerInventory.add(hpPotion, 2);
     traderInventory.add(hpPotion, 100);
     traderInventory.add(manaPotion, 100);
     traderInventory.addGold(5000);
 
-    playerInventory.add;
+    const builder = new Builder();
+    const playerInfo = builder.build();
+
     this.scene.start("GameScene", {
       inventory: playerInventory,
       traderInventory,
       treasures: Treasures,
-      items: ItemsData
+      items: ItemsData,
+      playerInfo,
+      currentZone: "tutorial",
+      currentWave: 1
     });
   }
 

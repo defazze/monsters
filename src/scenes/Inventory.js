@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import ItemsContainer from "../containers/ItemsContainer";
+import ItemsContainer from "../containers/items/ItemsContainer";
 
 const X = 200;
 const Y = 400;

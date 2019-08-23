@@ -15,6 +15,7 @@ export default class extends Phaser.GameObjects.Container {
     this.onDead = onDead;
 
     this.sprite = scene.physics.add.sprite(48, 64, asset);
+    //this.sprite.setTint(0x44ff44);
     this.healthBar = new HealthBar({ scene, x: 0, y: 15, health });
     scene.add.existing(this.healthBar);
     this.name = scene.add.text(16, 0, name, {

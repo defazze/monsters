@@ -4,7 +4,7 @@ export default class extends Phaser.GameObjects.Container {
   constructor({ scene, x, y, health }) {
     super(scene, x, y);
 
-    this.lenght = 90;
+    this.lenght = 80;
     this.health = health;
 
     this.progressBox = this.scene.add.graphics();
@@ -12,10 +12,10 @@ export default class extends Phaser.GameObjects.Container {
     this.healthBar = this.scene.add.graphics();
 
     this.progressBox.fillStyle(0x222222, 0.8);
-    this.progressBox.fillRect(0, 0, 96, 10);
+    this.progressBox.fillRect(5, 0, 91, 10);
 
     this.progressBar.fillStyle(0xffffff, 1);
-    this.progressBar.fillRect(2, 2, 2 + this.lenght, 6);
+    this.progressBar.fillRect(7, 2, 7 + this.lenght, 6);
 
     this.add([this.progressBox, this.progressBar, this.healthBar]);
 
@@ -35,6 +35,6 @@ export default class extends Phaser.GameObjects.Container {
 
     this.healthBar.clear();
     this.healthBar.fillStyle(0xff0000, 1);
-    this.healthBar.fillRect(2, 2, 2 + healthLenght, 6);
+    this.healthBar.fillRect(7, 2, 7 + healthLenght, 6);
   }
 }

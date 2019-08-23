@@ -9,7 +9,7 @@ export default class {
 
   removeMonster(lineIndex, rowIndex) {
     this.monsters = this.monsters.filter(
-      m => m.lineIndex == lineIndex && m.rowIndex == rowIndex
+      m => m.lineIndex != lineIndex || m.rowIndex != rowIndex
     );
   }
 
@@ -68,12 +68,10 @@ export default class {
 
     for (var i = 0; i < priorityLines.length; i++) {
       const chance = Phaser.Math.RND.between(1, 100);
-      if (chance <= p) {
+      if (chance <= p || i == priorityLines.length - 1) {
         return priorityLines[i];
       }
     }
-
-    return priorityLines[priorityLines.length - 1];
   }
 
   getMonstersCount = lineIndex =>
