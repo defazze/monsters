@@ -52,6 +52,12 @@ export default class extends Phaser.Scene {
       frameWidth: 51,
       frameHeight: 64
     });
+
+    this.load.atlas(
+      "knight",
+      "assets/images/knight-atlas.png",
+      "assets/atlas/knight-atlas.json"
+    );
   }
 
   create() {

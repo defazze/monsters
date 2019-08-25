@@ -31,15 +31,41 @@ export default class extends Phaser.Scene {
 
   create() {
     this.anims.create({
+      key: "knight-attack",
+      frames: this.anims.generateFrameNames("knight", {
+        prefix: "attack",
+        end: 6,
+        zeroPad: 2
+      }),
+      repeat: 0
+    });
+    this.anims.create({
       key: "knight-idle",
-      frames: this.anims.generateFrameNumbers("knight-idle"),
+      frames: this.anims.generateFrameNames("knight", {
+        prefix: "idle",
+        end: 6,
+        zeroPad: 2
+      }),
       frameRate: 10,
       repeat: -1
     });
-
     this.anims.create({
-      key: "knight-attack",
-      frames: this.anims.generateFrameNumbers("knight-attack"),
+      key: "knight-walk",
+      frames: this.anims.generateFrameNames("knight", {
+        prefix: "walk",
+        end: 6,
+        zeroPad: 2
+      }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "knight-hurt",
+      frames: this.anims.generateFrameNames("knight", {
+        prefix: "hurt",
+        end: 2,
+        zeroPad: 2
+      }),
       frameRate: 10,
       repeat: 0
     });
@@ -92,7 +118,7 @@ export default class extends Phaser.Scene {
       onDead: this.onPlayerDead
     });
     this.add.existing(this.player);
-    this.player.play("knight-idle");
+    this.player.idle();
 
     const gold = new Gold({
       scene: this,
@@ -137,7 +163,7 @@ export default class extends Phaser.Scene {
   }
 
   onMonsterClick = monster => {
-    this.player.play("knight-attack");
+    this.player.attack();
     const { monsterInfo } = monster;
     const damage = this.сalculator.toMonster(this.playerInfo, monsterInfo);
     monster.hit(damage);
@@ -188,7 +214,11 @@ export default class extends Phaser.Scene {
   onMosterAttack = monster => {
     const { monsterInfo } = monster;
     const damage = this.сalculator.toPlayer(monsterInfo, this.playerInfo);
-    this.player.hit(damage);
+
+    if (damage > 0) {
+      this.player.hit(damage);
+      this.player.hurt();
+    }
   };
 
   onPotionClick = potion => {
@@ -242,7 +272,13 @@ export default class extends Phaser.Scene {
       targets: this.background,
       tilePositionX: this.background.tilePositionX + MONSTER_AREA * CELL_SIZE,
       ease: "Sine.easeInOut",
-      duration: 2000
+      duration: 2000,
+      onComplete: () => {
+        this.player.idle();
+      }
     });
+
+    this.player.bringToTop();
+    this.player.walk();
   }
 }
