@@ -5,7 +5,7 @@ import { Monster } from "../containers/Monster";
 import Generator from "../core/MonsterGenerator";
 import Calculator from "../core/DamageCalculator";
 
-import { CELL_SIZE, SPAWN_DELAY } from "../constants/common";
+import { CELL_SIZE, SPAWN_DELAY, MONSTER_AREA } from "../constants/common";
 import { GOLD } from "../constants/drop";
 
 import { Player } from "../containers/Player";
@@ -22,6 +22,7 @@ export default class extends Phaser.Scene {
     super({ key: "GameScene" });
   }
 
+  monsters = [];
   init(data) {
     this.gameData = data;
   }
@@ -205,36 +206,41 @@ export default class extends Phaser.Scene {
   monstersGenerate() {
     const monstersInfo = this.generator.generate(this.gameData.currentWave);
 
-    this.monsters = monstersInfo.map(monsterInfo => {
-      const monster = new Monster({
-        scene: this,
-        x: monsterInfo.coords.x + 5 * CELL_SIZE,
-        y: monsterInfo.coords.y,
-        monsterInfo: monsterInfo,
-        health: monsterInfo.health,
-        onClick: this.onMonsterClick,
-        onAttack: this.onMosterAttack,
-        onDead: this.onMonsterDead,
-        battlefield: this.battlefield,
-        player: this.player
-      });
+    this.monsters = this.monsters.filter(m => !m.isDead);
 
-      this.add.existing(monster);
-      return monster;
-    });
+    this.monsters = this.monsters.concat(
+      monstersInfo.map(monsterInfo => {
+        const monster = new Monster({
+          scene: this,
+          x: monsterInfo.x,
+          y: monsterInfo.y,
+          monsterInfo: monsterInfo,
+          health: monsterInfo.health,
+          onClick: this.onMonsterClick,
+          onAttack: this.onMosterAttack,
+          onDead: this.onMonsterDead,
+          battlefield: this.battlefield,
+          player: this.player
+        });
 
-    this.monsters.forEach(m =>
-      this.tweens.add({
-        targets: m,
-        x: m.monsterInfo.coords.x,
-        ease: "Sine.easeInOut",
-        duration: 2000
+        this.add.existing(monster);
+        return monster;
       })
     );
 
+    this.monsters.forEach(m => {
+      m.monsterInfo.x -= MONSTER_AREA * CELL_SIZE;
+      this.tweens.add({
+        targets: m,
+        x: m.monsterInfo.x,
+        ease: "Sine.easeInOut",
+        duration: 2000
+      });
+    });
+
     this.tweens.add({
       targets: this.background,
-      tilePositionX: this.background.tilePositionX + 5 * CELL_SIZE,
+      tilePositionX: this.background.tilePositionX + MONSTER_AREA * CELL_SIZE,
       ease: "Sine.easeInOut",
       duration: 2000
     });

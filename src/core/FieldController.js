@@ -1,4 +1,9 @@
-import { CELL_SIZE } from "../constants/common";
+import {
+  CELL_SIZE,
+  MONSTER_AREA,
+  CENTER_ROW,
+  FIRST_MONSTER_LINE
+} from "../constants/common";
 
 import Phaser from "phaser";
 
@@ -6,6 +11,8 @@ export default class {
   constructor() {}
 
   monsters = [];
+  LINES = [9, 10, 11, 12];
+  ROWS = [0, 1, 2, 3, 4, 5, 6];
 
   removeMonster(lineIndex, rowIndex) {
     this.monsters = this.monsters.filter(
@@ -14,19 +21,19 @@ export default class {
   }
 
   setMonster(monsterInfo) {
-    const enableLines = [4, 5, 6, 7].filter(i => {
+    const enableLines = this.LINES.filter(i => {
       const count = this.getMonstersCount(i);
       return count > 0 && count < 7;
     });
 
-    const firstEmpty = [4, 5, 6, 7].find(i => this.getMonstersCount(i) == 0);
+    const firstEmpty = this.LINES.find(i => this.getMonstersCount(i) == 0);
     if (firstEmpty) {
       enableLines.push(firstEmpty);
     }
 
-    const priorityLines = (monsterInfo.priorityLines || [4, 5, 6, 7]).filter(
-      l => enableLines.some(a => a == l)
-    );
+    const priorityLines = (
+      monsterInfo.priorityLines.map(l => (l += MONSTER_AREA)) || lines
+    ).filter(l => enableLines.some(a => a == l));
 
     let monsterLineIndex = this.getLineByPriority(priorityLines);
 
@@ -35,11 +42,15 @@ export default class {
     }
 
     let monsterRowIndex = 0;
-    if (monsterLineIndex == 4 && this.isEmpty(4)) {
-      monsterRowIndex = 3;
+    if (
+      monsterLineIndex == FIRST_MONSTER_LINE + MONSTER_AREA &&
+      this.isEmpty(FIRST_MONSTER_LINE) &&
+      this.isEmpty(FIRST_MONSTER_LINE + MONSTER_AREA)
+    ) {
+      monsterRowIndex = CENTER_ROW;
     } else {
       monsterRowIndex = Phaser.Utils.Array.GetRandom(
-        [0, 1, 2, 3, 4, 5, 6].filter(
+        this.ROWS.filter(
           a =>
             !this.monsters
               .filter(m => m.lineIndex == monsterLineIndex)
@@ -49,15 +60,10 @@ export default class {
       );
     }
 
-    monsterInfo.lineIndex = monsterLineIndex;
-    monsterInfo.rowIndex = monsterRowIndex;
+    monsterInfo.x = (monsterLineIndex + 1) * CELL_SIZE;
+    monsterInfo.y = (monsterRowIndex + 1) * CELL_SIZE;
 
     this.monsters.push(monsterInfo);
-
-    return {
-      x: (monsterLineIndex + 2) * CELL_SIZE,
-      y: (monsterRowIndex + 1) * CELL_SIZE
-    };
   }
 
   getLineByPriority(priorityLines) {

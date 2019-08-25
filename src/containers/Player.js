@@ -17,7 +17,7 @@ export class Player extends Actor {
   }
 
   play(key) {
-    this.sprite.play(key);
+    this.sprite.anims.play(key);
     if (key == "knight-attack") {
       this.sprite.anims.chain("knight-idle");
     }

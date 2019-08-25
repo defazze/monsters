@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import Data from "../../data/monsters.json";
 import Zones from "../../data/zones.json";
-import { observable } from "../utils/Observable";
+import { proxy } from "./MonsterProxy";
 
 export default class {
   constructor(battlefield) {
@@ -27,7 +27,9 @@ export default class {
     let generatedMonsters = [];
 
     for (var num = 1; num <= count; num++) {
-      const monsterInfo = { ...Phaser.Utils.Array.GetRandom(commonMonsters) };
+      const monsterInfo = proxy({
+        ...Phaser.Utils.Array.GetRandom(commonMonsters)
+      });
       generatedMonsters.push(monsterInfo);
     }
 
@@ -36,9 +38,13 @@ export default class {
     uniqueMonsters.forEach(monsterInfo => {
       const spawnChance = Phaser.Math.RND.between(1, 100);
       if (monsterInfo.spawnRate > spawnChance) {
-        generatedMonsters.push({ ...monsterInfo });
+        generatedMonsters.push(proxy({ ...monsterInfo }));
       }
     });
+
+    generatedMonsters.forEach(
+      m => (m.priorityLines = m.priorityLines || [4, 5, 6, 7])
+    );
 
     generatedMonsters = generatedMonsters.sort(
       (a, b) => a.priorityLines[0] - b.priorityLines[0]
@@ -49,14 +55,12 @@ export default class {
   }
 
   setMonster(monsterInfo) {
-    const coords = this.battlefield.setMonster(monsterInfo);
+    this.battlefield.setMonster(monsterInfo);
 
     const health = Phaser.Math.RND.between(
       monsterInfo.minHealth,
       monsterInfo.maxHealth
     );
-
-    monsterInfo.coords = coords;
     monsterInfo.health = health;
   }
 }
