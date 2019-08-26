@@ -1,22 +1,26 @@
 [
   {
     "code": "hpPotion0",
+    "name": "Minor healing potion",
     "type": "potion",
     "resource": "health",
     "grade": 0,
     "asset": "hp-potion",
     "recoveryCount": 40,
     "recoveryTime": 6000,
-    "stackable": true
+    "stackable": true,
+    "cost": 30
   },
   {
     "code": "manaPotion0",
+    "name": "Minor mana potion",
     "type": "potion",
     "resource": "mana",
     "grade": 0,
     "asset": "mana-potion",
     "recoveryCount": 40,
     "recoveryTime": 6000,
-    "stackable": true
+    "stackable": true,
+    "cost": 60
   }
 ]

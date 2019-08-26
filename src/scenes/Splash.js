@@ -61,6 +61,46 @@ export default class extends Phaser.Scene {
   }
 
   create() {
+    this.anims.create({
+      key: "knight-attack",
+      frames: this.anims.generateFrameNames("knight", {
+        prefix: "attack",
+        end: 6,
+        zeroPad: 2
+      }),
+      repeat: 0
+    });
+    this.anims.create({
+      key: "knight-idle",
+      frames: this.anims.generateFrameNames("knight", {
+        prefix: "idle",
+        end: 6,
+        zeroPad: 2
+      }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "knight-walk",
+      frames: this.anims.generateFrameNames("knight", {
+        prefix: "walk",
+        end: 6,
+        zeroPad: 2
+      }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "knight-hurt",
+      frames: this.anims.generateFrameNames("knight", {
+        prefix: "hurt",
+        end: 2,
+        zeroPad: 2
+      }),
+      frameRate: 10,
+      repeat: 0
+    });
+
     const playerInventory = new InventoryController({
       rowsCount: INVENTORY_ROWS,
       columnsCount: INVENTORY_COLUMNS,

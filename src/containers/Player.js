@@ -40,8 +40,4 @@ export class Player extends Actor {
     this.sprite.anims.play(HURT);
     this.sprite.anims.chain(this.currentAnimation);
   }
-
-  bringToTop() {
-    this.sprite.setDepth(10);
-  }
 }

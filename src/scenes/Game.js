@@ -5,7 +5,12 @@ import { Monster } from "../containers/Monster";
 import Generator from "../core/MonsterGenerator";
 import Calculator from "../core/DamageCalculator";
 
-import { CELL_SIZE, SPAWN_DELAY, MONSTER_AREA } from "../constants/common";
+import {
+  CELL_SIZE,
+  SPAWN_DELAY,
+  MONSTER_AREA,
+  FIRST_MONSTER_LINE
+} from "../constants/common";
 import { GOLD } from "../constants/drop";
 
 import { Player } from "../containers/Player";
@@ -30,46 +35,6 @@ export default class extends Phaser.Scene {
   preload() {}
 
   create() {
-    this.anims.create({
-      key: "knight-attack",
-      frames: this.anims.generateFrameNames("knight", {
-        prefix: "attack",
-        end: 6,
-        zeroPad: 2
-      }),
-      repeat: 0
-    });
-    this.anims.create({
-      key: "knight-idle",
-      frames: this.anims.generateFrameNames("knight", {
-        prefix: "idle",
-        end: 6,
-        zeroPad: 2
-      }),
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: "knight-walk",
-      frames: this.anims.generateFrameNames("knight", {
-        prefix: "walk",
-        end: 6,
-        zeroPad: 2
-      }),
-      frameRate: 10,
-      repeat: -1
-    });
-    this.anims.create({
-      key: "knight-hurt",
-      frames: this.anims.generateFrameNames("knight", {
-        prefix: "hurt",
-        end: 2,
-        zeroPad: 2
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
     this.inventory = this.gameData.inventory;
     const { treasures, items } = this.gameData;
     this.dropController = new DropController(treasures, items);
@@ -181,28 +146,35 @@ export default class extends Phaser.Scene {
     monster.destroy();
     this.battlefield.removeMonster(lineIndex, monsterInfo.rowIndex);
 
-    if (this.battlefield.isEmpty(lineIndex)) {
-      const monsters = this.monsters.filter(
-        m => m.monsterInfo.lineIndex > lineIndex && !m.isDead
-      );
-
-      monsters.forEach(m => m.moveForward());
-      if (lineIndex == 4 && this.monsters.some(m => !m.isDead)) {
-        this.tweens.add({
-          targets: this.background,
-          tilePositionX: this.background.tilePositionX + CELL_SIZE,
-          ease: "Sine.easeInOut",
-          duration: 1000
-        });
-      }
-    }
-
     if (this.monsters.every(m => m.isDead || m.monsterInfo.isPermanent)) {
       this.gameData.currentWave++;
       if (this.gameData.currentWave > Zones[0].min.length) {
         this.scene.start("WinScene");
       } else {
         this.mustSpawn = true;
+      }
+    } else {
+      if (this.battlefield.isEmpty(lineIndex)) {
+        if (lineIndex == FIRST_MONSTER_LINE) {
+          const monsters = this.monsters.filter(m => !m.isDead);
+          monsters.forEach(m => m.moveForward());
+          this.player.walk();
+          this.tweens.add({
+            targets: this.background,
+            tilePositionX: this.background.tilePositionX + CELL_SIZE,
+            ease: "Sine.easeInOut",
+            duration: 1000,
+            onComplete: () => this.player.idle()
+          });
+        } else {
+          const monsters = this.monsters.filter(
+            m =>
+              m.monsterInfo.lineIndex > lineIndex &&
+              !m.isDead &&
+              !m.monsterInfo.isPermanent
+          );
+          monsters.forEach(m => m.moveForward());
+        }
       }
     }
   };
@@ -278,7 +250,7 @@ export default class extends Phaser.Scene {
       }
     });
 
-    this.player.bringToTop();
+    this.player.setDepth(1);
     this.player.walk();
   }
 }
