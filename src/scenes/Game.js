@@ -27,7 +27,6 @@ export default class extends Phaser.Scene {
     super({ key: "GameScene" });
   }
 
-  monsters = [];
   init(data) {
     this.gameData = data;
   }
@@ -35,6 +34,7 @@ export default class extends Phaser.Scene {
   preload() {}
 
   create() {
+    this.monsters = [];
     this.inventory = this.gameData.inventory;
     const { treasures, items } = this.gameData;
     this.dropController = new DropController(treasures, items);

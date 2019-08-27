@@ -110,7 +110,7 @@ export default class extends BaseContainer {
         }
       });
       item.on("pointerout", pointer => tooltip.destroy());
-
+      item.on("destroy", () => tooltip?.destroy());
       if (this.isDraggable) {
         this.scene.input.setDraggable(item);
       }

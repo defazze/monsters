@@ -14,6 +14,8 @@ export default class extends Phaser.Scene {
     //
     // load your assets
     //
+    this.load.image("approve", "assets/images/approve.png");
+    this.load.image("decline", "assets/images/decline.png");
     this.load.image("mushroom", "assets/images/mushroom2.png");
     this.load.image("pokemon", "assets/images/Pokemon2.jpg");
     this.load.image("bat", "assets/images/bat1.png");
