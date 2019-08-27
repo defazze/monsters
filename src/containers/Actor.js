@@ -6,6 +6,7 @@ export default class extends Phaser.GameObjects.Container {
   constructor({ scene, x, y, asset, name, health, onDead }) {
     super(scene, x, y);
 
+    this.setSize(96, 96);
     this.regenerator = new Regenerator();
 
     this.totalHealth = health;
@@ -14,16 +15,17 @@ export default class extends Phaser.GameObjects.Container {
 
     this.onDead = onDead;
 
-    this.sprite = scene.physics.add.sprite(48, 64, asset);
-    this.healthBar = new HealthBar({ scene, x: 0, y: 15, health });
+    this.sprite = scene.physics.add.sprite(0, 16, asset);
+    this.healthBar = new HealthBar({ scene, x: 0, y: -28, health });
     scene.add.existing(this.healthBar);
-    this.name = scene.add.text(16, 0, name, {
+
+    this.name = scene.add.text(-40, -48, name, {
       fontFamily: "Arial",
       fontSize: 12,
       color: "#0f0f0f"
     });
 
-    this.add([this.sprite, this.healthBar, this.name]);
+    this.add([this.name, this.healthBar, this.sprite]);
   }
 
   hit(damage) {

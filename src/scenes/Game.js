@@ -87,15 +87,14 @@ export default class extends Phaser.Scene {
     this.playerInfo = this.gameData.playerInfo;
     const player = new Player({
       scene: this,
-      x: CELL_SIZE * 4,
-      y: CELL_SIZE * 4,
+      x: CELL_SIZE * 4.5,
+      y: CELL_SIZE * 4.5,
       playerInfo: this.playerInfo,
       onDead: this.onPlayerDead
     });
 
     this.player = this.add.existing(player);
     this.physics.world.enable(this.player);
-    //this.player.setDepth(100);
     this.player.body.setCollideWorldBounds(true);
     this.player.idle();
 

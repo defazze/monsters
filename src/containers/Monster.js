@@ -42,13 +42,15 @@ export class Monster extends Actor {
   }
 
   onTimerStart = () => {
-    const { attackInterval = 1000 } = this.monsterInfo;
-    this.timer = this.scene.time.addEvent({
-      delay: attackInterval,
-      callback: this.attack,
-      callbackScope: this,
-      loop: true
-    });
+    if (this.scene) {
+      const { attackInterval = 1000 } = this.monsterInfo;
+      this.timer = this.scene.time.addEvent({
+        delay: attackInterval,
+        callback: this.attack,
+        callbackScope: this,
+        loop: true
+      });
+    }
   };
 
   attack = () => {
@@ -57,8 +59,8 @@ export class Monster extends Actor {
     );
 
     if (this.monsterInfo.isRanged && lineDistance > 1) {
-      const targetX = this.player.x + CELL_SIZE / 2;
-      const targetY = this.player.y + CELL_SIZE / 2;
+      const targetX = this.player.x;
+      const targetY = this.player.y;
 
       const a = this.x - targetX;
       const b = targetY - this.y;
@@ -66,8 +68,8 @@ export class Monster extends Actor {
       const arrowY = this.y + B;
 
       const start = {
-        x: this.x,
-        y: this.y + CELL_SIZE / 2
+        x: this.x - CELL_SIZE / 2,
+        y: this.y
       };
       const end = {
         x: 0,
@@ -75,7 +77,12 @@ export class Monster extends Actor {
       };
 
       const arrow = this.scene.physics.add.sprite(start.x, start.y, "arrow");
+
       const angle = Phaser.Math.Angle.Between(end.x, end.y, start.x, start.y);
+
+      arrow.rotation = angle;
+      const bounds = arrow.getBounds();
+      arrow.setSize(bounds.width, bounds.height);
       const distance = Phaser.Math.Distance.Between(
         end.x,
         end.y,
@@ -83,7 +90,6 @@ export class Monster extends Actor {
         start.y
       );
       const speed = 0.2;
-      arrow.rotation = angle;
 
       this.scene.tweens.add({
         targets: arrow,
@@ -103,8 +109,7 @@ export class Monster extends Actor {
       arrow.setCollideWorldBounds(true);
       arrow.body.onWorldBounds = true;
       this.scene.physics.world.once("worldbounds", arrow => {
-        console.log(arrow);
-        arrow.destroy();
+        arrow.gameObject.destroy();
       });
     } else {
       this.onAttack(this);

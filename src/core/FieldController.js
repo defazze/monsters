@@ -60,8 +60,8 @@ export default class {
       );
     }
 
-    monsterInfo.x = (monsterLineIndex + 1) * CELL_SIZE;
-    monsterInfo.y = (monsterRowIndex + 1) * CELL_SIZE;
+    monsterInfo.x = (monsterLineIndex + 1.5) * CELL_SIZE;
+    monsterInfo.y = (monsterRowIndex + 1.5) * CELL_SIZE;
 
     this.monsters.push(monsterInfo);
   }
