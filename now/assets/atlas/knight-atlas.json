@@ -1,0 +1,172 @@
+﻿{
+  "frames": [
+    {
+      "filename": "attack00",
+      "frame": { "x": 0, "y": 0, "w": 124, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "attack01",
+      "frame": { "x": 124, "y": 0, "w": 124, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "attack02",
+      "frame": { "x": 248, "y": 0, "w": 124, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "attack03",
+      "frame": { "x": 372, "y": 0, "w": 124, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "attack04",
+      "frame": { "x": 496, "y": 0, "w": 124, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "attack05",
+      "frame": { "x": 620, "y": 0, "w": 124, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "idle00",
+      "frame": { "x": 0, "y": 64, "w": 45, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "idle01",
+      "frame": { "x": 45, "y": 64, "w": 45, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "idle02",
+      "frame": { "x": 90, "y": 64, "w": 45, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "idle03",
+      "frame": { "x": 135, "y": 64, "w": 45, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "idle04",
+      "frame": { "x": 180, "y": 64, "w": 45, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "idle05",
+      "frame": { "x": 225, "y": 64, "w": 45, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "walk00",
+      "frame": { "x": 0, "y": 128, "w": 51, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "walk01",
+      "frame": { "x": 51, "y": 128, "w": 51, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "walk02",
+      "frame": { "x": 102, "y": 128, "w": 51, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "walk03",
+      "frame": { "x": 153, "y": 128, "w": 51, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "walk04",
+      "frame": { "x": 204, "y": 128, "w": 51, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "walk05",
+      "frame": { "x": 255, "y": 128, "w": 51, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "hurt00",
+      "frame": { "x": 0, "y": 192, "w": 51, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    },
+    {
+      "filename": "hurt01",
+      "frame": { "x": 51, "y": 192, "w": 51, "h": 64 },
+      "rotated": false,
+      "trimmed": true,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 }
+    }
+  ],
+  "meta": {
+    "app": "Adobe Flash CS6",
+    "version": "12.0.0.481",
+    "image": "knight_atlas.png",
+    "format": "RGBA8888",
+    "size": { "w": 744, "h": 128 },
+    "scale": "1"
+  }
+}

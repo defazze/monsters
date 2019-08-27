@@ -44,6 +44,16 @@ export default class extends Phaser.Scene {
     this.spawnDelayRun = false;
 
     this.cameras.main.setBackgroundColor(0x8ee5ee);
+    this.physics.world.setBounds(
+      CELL_SIZE,
+      CELL_SIZE,
+      CELL_SIZE * 9,
+      CELL_SIZE * 7
+    );
+    this.physics.world.setBoundsCollision(false, false, true, true);
+
+    this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
 
     this.background = this.add.tileSprite(
       CELL_SIZE + (CELL_SIZE * 9) / 2,
@@ -75,14 +85,18 @@ export default class extends Phaser.Scene {
     this.mustSpawn = true;
 
     this.playerInfo = this.gameData.playerInfo;
-    this.player = new Player({
+    const player = new Player({
       scene: this,
       x: CELL_SIZE * 4,
       y: CELL_SIZE * 4,
       playerInfo: this.playerInfo,
       onDead: this.onPlayerDead
     });
-    this.add.existing(this.player);
+
+    this.player = this.add.existing(player);
+    this.physics.world.enable(this.player);
+    //this.player.setDepth(100);
+    this.player.body.setCollideWorldBounds(true);
     this.player.idle();
 
     const gold = new Gold({
@@ -107,6 +121,15 @@ export default class extends Phaser.Scene {
   }
 
   update(time, delta) {
+    const { body } = this.player;
+    if (this.keyW.isDown) {
+      body.setVelocityY(-200);
+    } else if (this.keyS.isDown) {
+      body.setVelocityY(200);
+    } else {
+      body.setVelocityY(0);
+    }
+
     if (this.monsters) {
       this.monsters.forEach(m => m.update(time, delta));
     }
@@ -250,7 +273,6 @@ export default class extends Phaser.Scene {
       }
     });
 
-    this.player.setDepth(1);
     this.player.walk();
   }
 }
