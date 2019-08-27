@@ -100,6 +100,8 @@ export class Monster extends Actor {
         this
       );
 
+      arrow.setCollideWorldBounds(true);
+      arrow.body.onWorldBounds = true;
       this.scene.physics.world.once("worldbounds", arrow => {
         console.log(arrow);
         arrow.destroy();
