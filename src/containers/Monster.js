@@ -57,14 +57,23 @@ export class Monster extends Actor {
     );
 
     if (this.monsterInfo.isRanged && lineDistance > 1) {
+      const targetX = this.player.x + CELL_SIZE / 2;
+      const targetY = this.player.y + CELL_SIZE / 2;
+
+      const a = this.x - targetX;
+      const b = targetY - this.y;
+      const B = (this.x * b) / a;
+      const arrowY = this.y + B;
+
       const start = {
         x: this.x,
         y: this.y + CELL_SIZE / 2
       };
       const end = {
-        x: this.player.x + CELL_SIZE / 2,
-        y: this.player.y + CELL_SIZE / 2
+        x: 0,
+        y: arrowY
       };
+
       const arrow = this.scene.physics.add.sprite(start.x, start.y, "arrow");
       const angle = Phaser.Math.Angle.Between(end.x, end.y, start.x, start.y);
       const distance = Phaser.Math.Distance.Between(
@@ -90,6 +99,11 @@ export class Monster extends Actor {
         null,
         this
       );
+
+      this.scene.physics.world.once("worldbounds", arrow => {
+        console.log(arrow);
+        arrow.destroy();
+      });
     } else {
       this.onAttack(this);
     }
