@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { CELL_SIZE, BORDER_WIDTH } from "../../constants/inventory";
 
-const CELL_COLOR = 0xd2c1c6; /*0x8383838*/
+const CELL_COLOR = 0xd2c1c6;
 export default class extends Phaser.GameObjects.Container {
   constructor({
     scene,

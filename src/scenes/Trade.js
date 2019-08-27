@@ -38,7 +38,8 @@ export default class extends Phaser.Scene {
       y: 500,
       rows: inventory.rowsCount,
       columns: inventory.columnsCount,
-      onItemClick: onPlayerItemClick
+      onItemClick: onPlayerItemClick,
+      showSellPrice: true
     });
     this.add.existing(playerContainer);
 
@@ -49,7 +50,8 @@ export default class extends Phaser.Scene {
       rows: traderInventory.rowsCount,
       columns: traderInventory.columnsCount,
       onItemClick: onTraderItemClick,
-      isDraggable: false
+      isDraggable: false,
+      showCost: true
     });
     this.add.existing(traderContainer);
 
