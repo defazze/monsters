@@ -6,14 +6,14 @@
   },
   {
     "name": "tutorial chest",
-    "picks": 2,
+    "picks": 4,
     "drops": ["noDrop", "gold", "potion0"],
-    "probs": [100, 15, 5],
+    "probs": [50, 30, 15],
     "goldRate": 2
   },
   {
     "name": "potion0",
     "drops": ["hpPotion0", "manaPotion0"],
-    "probs": [7, 3]
+    "probs": [8, 2]
   }
 ]

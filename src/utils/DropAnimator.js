@@ -16,13 +16,11 @@ export default class {
   }
 
   animate(drops, x, y) {
+    let shiftX = 0;
+    let shiftY = 0;
     drops.forEach(d => {
       if (d.code == GOLD) {
-        const coin = this.scene.add.sprite(
-          x + CELL_SIZE / 2,
-          y + CELL_SIZE / 2,
-          "coin"
-        );
+        const coin = this.scene.add.sprite(x + shiftX, y + shiftY, "coin");
         coin.anims.play("flip");
         coin.once("animationcomplete", () => {
           coin.destroy();
@@ -30,25 +28,24 @@ export default class {
 
         this.scene.tweens.add({
           targets: coin,
-          y: y + CELL_SIZE / 2 - 30,
+          y: y - 30 + shiftY,
           ease: "Sine.easeInOut",
           duration: 400
         });
       } else {
-        const item = this.scene.add.sprite(
-          x + CELL_SIZE / 2,
-          y + CELL_SIZE / 2,
-          d.asset
-        );
+        const item = this.scene.add.sprite(x + shiftX, y + shiftY, d.asset);
 
         item.setScale(0.8);
         this.scene.tweens.add({
           targets: item,
-          y: y + CELL_SIZE / 2 - 30,
+          y: y - 30 + shiftY,
           ease: "Sine.easeInOut",
           duration: 300,
           onComplete: () => item.destroy()
         });
+
+        shiftX += 10;
+        shiftY -= 10;
       }
     });
   }
