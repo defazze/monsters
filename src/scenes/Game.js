@@ -51,6 +51,11 @@ export default class extends Phaser.Scene {
       CELL_SIZE * 7
     );
     this.physics.world.setBoundsCollision(true, true, true, true);
+    this.physics.world.on("worldbounds", g => {
+      if (g.gameObject.isArrow) {
+        g.gameObject.destroy();
+      }
+    });
 
     this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
