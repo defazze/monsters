@@ -25,9 +25,10 @@ export default class {
     let monsterLineIndex = 0;
 
     if (monsterInfo.isChampion) {
+      //debugger;
       monsterLineIndex = Math.min(
-        Math.max(...this.monsters.map(m => m.lineIndex)) + 1,
-        7
+        Math.max(...this.monsters.map(m => m.lineIndex)) + 2,
+        12
       );
       monsterRowIndex = CENTER_ROW;
 
@@ -36,7 +37,7 @@ export default class {
       monsterInfo.minions.forEach(m => {
         const minionLineIndex = monsterLineIndex - 1;
         const minionRowIndex =
-          monsterRowIndex - monsterInfo.minions.indexOf(m) - 1;
+          monsterRowIndex - (monsterInfo.minions.indexOf(m) - 1);
 
         this.removeMonster(minionLineIndex, minionRowIndex);
         m.x = (minionLineIndex + 1.5) * CELL_SIZE;

@@ -32,16 +32,22 @@ export default class {
       generatedMonsters.push(monsterInfo);
     }
 
-    if (wave == 5) {
+    if (wave == 7) {
       const champion = getMonster();
       champion.priorityLines = [8];
+
       const minion = { ...champion };
-      minion.minHealh = minion.minHealh * 2;
-      minion.maxHealh = minion.maxHealh * 2;
-      champion.minions = [minion, ...minion, ...minion];
-      champion.minHealh = champion.minHealh * 3;
-      champion.maxHealh = champion.maxHealh * 3;
+      minion.minHealth = minion.minHealth * 2;
+      minion.maxHealth = minion.maxHealth * 2;
+      minion.isMinion = true;
+
+      champion.minions = [minion, { ...minion }, { ...minion }];
+      champion.minHealth = champion.minHealth * 3;
+      champion.maxHealth = champion.maxHealth * 3;
       champion.isChampion = true;
+
+      generatedMonsters.push(champion);
+      generatedMonsters = generatedMonsters.concat(champion.minions);
     }
 
     const uniqueMonsters = enabledMonsters.filter(m => m.isUnique);
@@ -62,16 +68,19 @@ export default class {
     );
 
     generatedMonsters.forEach(m => this.setMonster(m));
+
     return generatedMonsters;
   }
 
   setMonster(monsterInfo) {
-    this.battlefield.setMonster(monsterInfo);
-
+    if (!monsterInfo.isMinion) {
+      this.battlefield.setMonster(monsterInfo);
+    }
     const health = Phaser.Math.RND.between(
       monsterInfo.minHealth,
       monsterInfo.maxHealth
     );
+
     monsterInfo.health = health;
   }
 }
