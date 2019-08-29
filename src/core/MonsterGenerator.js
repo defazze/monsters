@@ -14,10 +14,6 @@ export default class {
       m => m.minWave <= wave && m.maxWave >= wave
     );
 
-    enabledMonsters.forEach(
-      m => (m.priorityLines = m.priorityLines || [4, 5, 6, 7])
-    );
-
     const commonMonsters = enabledMonsters.filter(m => !m.isUnique);
 
     const minCount = Zones[0].min[wave - 1];
@@ -26,11 +22,26 @@ export default class {
 
     let generatedMonsters = [];
 
-    for (var num = 1; num <= count; num++) {
-      const monsterInfo = proxy({
+    const getMonster = () =>
+      proxy({
         ...Phaser.Utils.Array.GetRandom(commonMonsters)
       });
+
+    for (var num = 1; num <= count; num++) {
+      const monsterInfo = getMonster();
       generatedMonsters.push(monsterInfo);
+    }
+
+    if (wave == 5) {
+      const champion = getMonster();
+      champion.priorityLines = [8];
+      const minion = { ...champion };
+      minion.minHealh = minion.minHealh * 2;
+      minion.maxHealh = minion.maxHealh * 2;
+      champion.minions = [minion, ...minion, ...minion];
+      champion.minHealh = champion.minHealh * 3;
+      champion.maxHealh = champion.maxHealh * 3;
+      champion.isChampion = true;
     }
 
     const uniqueMonsters = enabledMonsters.filter(m => m.isUnique);

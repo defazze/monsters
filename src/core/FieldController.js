@@ -21,43 +21,67 @@ export default class {
   }
 
   setMonster(monsterInfo) {
-    const enableLines = this.LINES.filter(i => {
-      const count = this.getMonstersCount(i);
-      return count > 0 && count < 7;
-    });
-
-    const firstEmpty = this.LINES.find(i => this.getMonstersCount(i) == 0);
-    if (firstEmpty) {
-      enableLines.push(firstEmpty);
-    }
-
-    const priorityLines = (
-      monsterInfo.priorityLines.map(l => (l += MONSTER_AREA)) || lines
-    ).filter(l => enableLines.some(a => a == l));
-
-    let monsterLineIndex = this.getLineByPriority(priorityLines);
-
-    if (monsterLineIndex == -1) {
-      monsterLineIndex = Phaser.Utils.Array.GetRandom(enableLines);
-    }
-
     let monsterRowIndex = 0;
-    if (
-      monsterLineIndex == FIRST_MONSTER_LINE + MONSTER_AREA &&
-      this.isEmpty(FIRST_MONSTER_LINE) &&
-      this.isEmpty(FIRST_MONSTER_LINE + MONSTER_AREA)
-    ) {
-      monsterRowIndex = CENTER_ROW;
-    } else {
-      monsterRowIndex = Phaser.Utils.Array.GetRandom(
-        this.ROWS.filter(
-          a =>
-            !this.monsters
-              .filter(m => m.lineIndex == monsterLineIndex)
-              .map(m => m.rowIndex)
-              .includes(a)
-        )
+    let monsterLineIndex = 0;
+
+    if (monsterInfo.isChampion) {
+      monsterLineIndex = Math.min(
+        Math.max(...this.monsters.map(m => m.lineIndex)) + 1,
+        7
       );
+      monsterRowIndex = CENTER_ROW;
+
+      this.removeMonster(monsterLineIndex, monsterRowIndex);
+
+      monsterInfo.minions.forEach(m => {
+        const minionLineIndex = monsterLineIndex - 1;
+        const minionRowIndex =
+          monsterRowIndex - monsterInfo.minions.indexOf(m) - 1;
+
+        this.removeMonster(minionLineIndex, minionRowIndex);
+        m.x = (minionLineIndex + 1.5) * CELL_SIZE;
+        m.y = (minionRowIndex + 1.5) * CELL_SIZE;
+
+        this.monsters.push(m);
+      });
+    } else {
+      const enableLines = this.LINES.filter(i => {
+        const count = this.getMonstersCount(i);
+        return count > 0 && count < 7;
+      });
+
+      const firstEmpty = this.LINES.find(i => this.getMonstersCount(i) == 0);
+      if (firstEmpty) {
+        enableLines.push(firstEmpty);
+      }
+
+      const priorityLines = (
+        monsterInfo.priorityLines.map(l => (l += MONSTER_AREA)) || lines
+      ).filter(l => enableLines.some(a => a == l));
+
+      monsterLineIndex = this.getLineByPriority(priorityLines);
+
+      if (monsterLineIndex == -1) {
+        monsterLineIndex = Phaser.Utils.Array.GetRandom(enableLines);
+      }
+
+      if (
+        monsterLineIndex == FIRST_MONSTER_LINE + MONSTER_AREA &&
+        this.isEmpty(FIRST_MONSTER_LINE) &&
+        this.isEmpty(FIRST_MONSTER_LINE + MONSTER_AREA)
+      ) {
+        monsterRowIndex = CENTER_ROW;
+      } else {
+        monsterRowIndex = Phaser.Utils.Array.GetRandom(
+          this.ROWS.filter(
+            a =>
+              !this.monsters
+                .filter(m => m.lineIndex == monsterLineIndex)
+                .map(m => m.rowIndex)
+                .includes(a)
+          )
+        );
+      }
     }
 
     monsterInfo.x = (monsterLineIndex + 1.5) * CELL_SIZE;
