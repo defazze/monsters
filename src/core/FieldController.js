@@ -21,31 +21,32 @@ export default class {
   }
 
   setMonster(monsterInfo) {
-    let monsterRowIndex = 0;
-    let monsterLineIndex = 0;
+    const push = (monster, lineIndex, rowIndex) => {
+      monster.x = (lineIndex + 1.5) * CELL_SIZE;
+      monster.y = (rowIndex + 1.5) * CELL_SIZE;
+
+      this.monsters.push(monster);
+    };
 
     if (monsterInfo.isChampion) {
-      //debugger;
-      monsterLineIndex = Math.min(
+      const championLineIndex = Math.min(
         Math.max(...this.monsters.map(m => m.lineIndex)) + 2,
         12
       );
-      monsterRowIndex = CENTER_ROW;
+      const championRowIndex = CENTER_ROW;
 
-      this.removeMonster(monsterLineIndex, monsterRowIndex);
+      this.removeMonster(championLineIndex, championRowIndex);
+      push(monsterInfo, championLineIndex, championRowIndex);
 
       monsterInfo.minions.forEach(m => {
-        const minionLineIndex = monsterLineIndex - 1;
+        const minionLineIndex = championLineIndex - 1;
         const minionRowIndex =
-          monsterRowIndex - (monsterInfo.minions.indexOf(m) - 1);
+          championRowIndex - (monsterInfo.minions.indexOf(m) - 1);
 
         this.removeMonster(minionLineIndex, minionRowIndex);
-        m.x = (minionLineIndex + 1.5) * CELL_SIZE;
-        m.y = (minionRowIndex + 1.5) * CELL_SIZE;
-
-        this.monsters.push(m);
+        push(m, minionLineIndex, minionRowIndex);
       });
-    } else {
+    } else if (!monsterInfo.champion) {
       const enableLines = this.LINES.filter(i => {
         const count = this.getMonstersCount(i);
         return count > 0 && count < 7;
@@ -60,35 +61,29 @@ export default class {
         monsterInfo.priorityLines.map(l => (l += MONSTER_AREA)) || lines
       ).filter(l => enableLines.some(a => a == l));
 
-      monsterLineIndex = this.getLineByPriority(priorityLines);
+      const monsterLineIndex = this.getLineByPriority(priorityLines);
 
       if (monsterLineIndex == -1) {
         monsterLineIndex = Phaser.Utils.Array.GetRandom(enableLines);
       }
 
-      if (
+      const monsterRowIndex =
         monsterLineIndex == FIRST_MONSTER_LINE + MONSTER_AREA &&
         this.isEmpty(FIRST_MONSTER_LINE) &&
         this.isEmpty(FIRST_MONSTER_LINE + MONSTER_AREA)
-      ) {
-        monsterRowIndex = CENTER_ROW;
-      } else {
-        monsterRowIndex = Phaser.Utils.Array.GetRandom(
-          this.ROWS.filter(
-            a =>
-              !this.monsters
-                .filter(m => m.lineIndex == monsterLineIndex)
-                .map(m => m.rowIndex)
-                .includes(a)
-          )
-        );
-      }
+          ? CENTER_ROW
+          : Phaser.Utils.Array.GetRandom(
+              this.ROWS.filter(
+                a =>
+                  !this.monsters
+                    .filter(m => m.lineIndex == monsterLineIndex)
+                    .map(m => m.rowIndex)
+                    .includes(a)
+              )
+            );
+
+      push(monsterInfo, monsterLineIndex, monsterRowIndex);
     }
-
-    monsterInfo.x = (monsterLineIndex + 1.5) * CELL_SIZE;
-    monsterInfo.y = (monsterRowIndex + 1.5) * CELL_SIZE;
-
-    this.monsters.push(monsterInfo);
   }
 
   getLineByPriority(priorityLines) {

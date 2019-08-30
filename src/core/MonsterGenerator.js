@@ -35,15 +35,15 @@ export default class {
     if (wave == 7) {
       const champion = getMonster();
       champion.priorityLines = [8];
-
       const minion = { ...champion };
-      minion.minHealth = minion.minHealth * 2;
-      minion.maxHealth = minion.maxHealth * 2;
-      minion.isMinion = true;
+      minion.minHealth = minion.minHealth * 1.5;
+      minion.maxHealth = minion.maxHealth * 1.5;
+      minion.champion = champion;
 
-      champion.minions = [minion, { ...minion }, { ...minion }];
+      champion.minions = [...Array(3).keys()].map(a => proxy({ ...minion }));
       champion.minHealth = champion.minHealth * 3;
       champion.maxHealth = champion.maxHealth * 3;
+      champion.treasure += " C";
       champion.isChampion = true;
 
       generatedMonsters.push(champion);
@@ -73,9 +73,8 @@ export default class {
   }
 
   setMonster(monsterInfo) {
-    if (!monsterInfo.isMinion) {
-      this.battlefield.setMonster(monsterInfo);
-    }
+    this.battlefield.setMonster(monsterInfo);
+
     const health = Phaser.Math.RND.between(
       monsterInfo.minHealth,
       monsterInfo.maxHealth

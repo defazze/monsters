@@ -35,6 +35,14 @@ export class Monster extends Actor {
       cursor: "url(assets/cursors/sword.cur), pointer"
     });
 
+    if (monsterInfo.isChampion) {
+      this.sprite.setTint(0xda1820);
+    }
+
+    if (monsterInfo.champion) {
+      this.sprite.setTint(0xea4cc0);
+    }
+
     this.on("pointerdown", () => onClick(this));
     this.on("destroy", this.onDestroy);
 
