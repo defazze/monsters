@@ -66,6 +66,13 @@ export default class {
   }
 
   getChanceToHit(attackRating, defence) {
+    return Phaser.Math.Clamp(
+      100 * (attackRating / (attackRating + defence)),
+      5,
+      95
+    );
+
+    /*
     let chanceToHit = 100 * (attackRating / (attackRating + defence));
     if (chanceToHit < 5) {
       chanceToHit = 5;
@@ -74,6 +81,6 @@ export default class {
       chanceToHit = 95;
     }
 
-    return chanceToHit;
+    return chanceToHit;*/
   }
 }
