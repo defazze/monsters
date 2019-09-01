@@ -20,17 +20,12 @@ export default class {
     const maxCount = Zones[0].max[wave - 1];
     const count = Phaser.Math.RND.between(minCount, maxCount);
 
-    let generatedMonsters = [];
-
     const getMonster = () =>
       proxy({
         ...Phaser.Utils.Array.GetRandom(commonMonsters)
       });
 
-    for (var num = 1; num <= count; num++) {
-      const monsterInfo = getMonster();
-      generatedMonsters.push(monsterInfo);
-    }
+    let generatedMonsters = [...Array(count).keys()].map(a => getMonster());
 
     if (wave == 7) {
       const champion = getMonster();
@@ -59,27 +54,17 @@ export default class {
       }
     });
 
-    generatedMonsters.forEach(
-      m => (m.priorityLines = m.priorityLines || [4, 5, 6, 7])
-    );
+    generatedMonsters.forEach(m => {
+      m.priorityLines = m.priorityLines || [4, 5, 6, 7];
+      const health = Phaser.Math.RND.between(m.minHealth, m.maxHealth);
+      m.health = health;
+    });
 
     generatedMonsters = generatedMonsters.sort(
       (a, b) => a.priorityLines[0] - b.priorityLines[0]
     );
 
-    generatedMonsters.forEach(m => this.setMonster(m));
-
-    return generatedMonsters;
-  }
-
-  setMonster(monsterInfo) {
-    this.battlefield.setMonster(monsterInfo);
-
-    const health = Phaser.Math.RND.between(
-      monsterInfo.minHealth,
-      monsterInfo.maxHealth
-    );
-
-    monsterInfo.health = health;
+    const newMonsters = this.battlefield.addMonsters(generatedMonsters);
+    return newMonsters;
   }
 }
