@@ -1,8 +1,8 @@
 /* globals __DEV__ */
 import Phaser from "phaser";
 
-import { Monster } from "../containers/Monster";
-import Generator from "../core/MonsterGenerator";
+import { createMonster } from "../containers/Monster";
+import BattlefieldController from "../core/BattlefieldController";
 import Calculator from "../core/DamageCalculator";
 
 import {
@@ -14,7 +14,6 @@ import {
 import { GOLD } from "../constants/drop";
 
 import { Player } from "../containers/Player";
-import Battlefield from "../core/FieldController.js";
 import Gold from "../containers/Gold";
 import DropController from "../core/DropController";
 import DropAnimator from "../utils/DropAnimator";
@@ -83,21 +82,20 @@ export default class extends Phaser.Scene {
 
     this.input.keyboard.on("keydown", this.onKeyPressed);
 
-    this.battlefield = new Battlefield();
-    this.generator = new Generator(this.battlefield);
+    this.battlefieldController = new BattlefieldController(this, this.gameData);
     this.сalculator = new Calculator();
 
     this.mustSpawn = true;
 
-    this.playerInfo = this.gameData.playerInfo;
     const player = new Player({
       scene: this,
       x: CELL_SIZE * 4.5,
       y: CELL_SIZE * 4.5,
-      playerInfo: this.playerInfo,
+      playerInfo: this.gameData.playerInfo,
       onDead: this.onPlayerDead
     });
 
+    this.playerInfo = player.actorInfo;
     this.player = this.add.existing(player);
     this.physics.world.enable(this.player);
     this.player.body.setCollideWorldBounds(true);
@@ -146,7 +144,7 @@ export default class extends Phaser.Scene {
         if (time >= this.spawnTime) {
           this.mustSpawn = false;
           this.spawnDelayRun = false;
-          this.monstersGenerate();
+          this.events.emit("onGenerateMonsters");
         }
       }
     }
@@ -157,9 +155,16 @@ export default class extends Phaser.Scene {
   onMonsterClick = monster => {
     this.player.attack();
     const { monsterInfo } = monster;
-    const damage = this.сalculator.toMonster(this.playerInfo, monsterInfo);
-    monster.hit(damage);
+    this.events.emit("onPlayerAttack", monsterInfo, this.playerInfo);
   };
+
+  dropAnimate(drops, monsterInfo) {
+    this.dropAnimator.animate(drops, monsterInfo.x, monsterInfo.y);
+  }
+
+  win() {
+    this.scene.start("WinScene");
+  }
 
   onMonsterDead = monster => {
     const { monsterInfo } = monster;
@@ -185,6 +190,7 @@ export default class extends Phaser.Scene {
         if (lineIndex == FIRST_MONSTER_LINE) {
           const monsters = this.monsters.filter(m => !m.isDead);
           monsters.forEach(m => m.moveForward());
+
           this.player.walk();
           this.tweens.add({
             targets: this.background,
@@ -210,14 +216,13 @@ export default class extends Phaser.Scene {
     this.scene.start("GameOverScene");
   };
 
+  hurtPlayer() {
+    this.player.hurt();
+  }
+
   onMosterAttack = monster => {
     const { monsterInfo } = monster;
-    const damage = this.сalculator.toPlayer(monsterInfo, this.playerInfo);
-
-    if (damage > 0) {
-      this.player.hit(damage);
-      this.player.hurt();
-    }
+    this.events.emit("onMonsterAttack", monsterInfo, this.playerInfo);
   };
 
   onPotionClick = potion => {
@@ -232,36 +237,28 @@ export default class extends Phaser.Scene {
     this.fastItems.keyPress(event.key);
   };
 
-  monstersGenerate() {
-    const monstersInfo = this.generator.generate(this.gameData.currentWave);
-
+  addMonsters(monstersInfo) {
     this.monsters = this.monsters.filter(m => !m.isDead);
 
-    this.monsters = this.monsters.concat(
-      monstersInfo.map(monsterInfo => {
-        const monster = new Monster({
-          scene: this,
-          x: monsterInfo.x,
-          y: monsterInfo.y,
-          monsterInfo: monsterInfo,
-          health: monsterInfo.health,
-          onClick: this.onMonsterClick,
-          onAttack: this.onMosterAttack,
-          onDead: this.onMonsterDead,
-          battlefield: this.battlefield,
-          player: this.player
-        });
+    const newMonsters = monstersInfo.map(monsterInfo => {
+      const monster = createMonster({
+        scene: this,
+        monsterInfo,
+        onMonsterClick: this.onMonsterClick,
+        onMonsterAttack: this.onMosterAttack,
+        onMonsterDead: this.onMonsterDead,
+        player: this.player
+      });
+      this.add.existing(monster);
+      return monster;
+    });
 
-        this.add.existing(monster);
-        return monster;
-      })
-    );
+    this.monsters.push(...newMonsters);
 
     this.monsters.forEach(m => {
-      m.monsterInfo.x -= MONSTER_AREA * CELL_SIZE;
       this.tweens.add({
         targets: m,
-        x: m.monsterInfo.x,
+        x: (m.monsterInfo.initX -= MONSTER_AREA * CELL_SIZE),
         ease: "Sine.easeInOut",
         duration: 2000
       });
@@ -278,5 +275,7 @@ export default class extends Phaser.Scene {
     });
 
     this.player.walk();
+
+    return newMonsters.map(m => m.monsterInfo);
   }
 }

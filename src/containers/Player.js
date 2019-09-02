@@ -6,38 +6,35 @@ const HURT = "knight-hurt";
 const ATTACK = "knight-attack";
 
 export class Player extends Actor {
-  constructor({ scene, x, y, playerInfo, onDead }) {
+  constructor({ scene, x, y, playerInfo }) {
     super({
       scene,
       x,
       y,
-      health: playerInfo.health,
-      asset: "knight",
-      name: "Knight",
-      onDead
+      actorInfo: playerInfo
     });
 
     this.playerInfo = playerInfo;
     this.currentAnimation = IDLE;
   }
 
-  idle() {
+  idle = () => {
     this.currentAnimation = IDLE;
     this.sprite.anims.play(this.currentAnimation);
-  }
+  };
 
-  walk() {
+  walk = () => {
     this.currentAnimation = WALK;
     this.sprite.anims.play(this.currentAnimation);
-  }
+  };
 
-  attack() {
+  attack = () => {
     this.sprite.anims.play(ATTACK);
     this.sprite.anims.chain(this.currentAnimation);
-  }
+  };
 
-  hurt() {
+  hurt = () => {
     this.sprite.anims.play(HURT);
     this.sprite.anims.chain(this.currentAnimation);
-  }
+  };
 }

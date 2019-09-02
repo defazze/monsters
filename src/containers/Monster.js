@@ -1,33 +1,43 @@
 import Phaser from "phaser";
 import Actor from "./Actor";
 import { CELL_SIZE } from "../constants/common";
+import { proxy } from "../core/ActorInfoProxy";
 
-export class Monster extends Actor {
-  constructor({
+export const createMonster = ({
+  scene,
+  monsterInfo,
+  onMonsterClick,
+  onMonsterAttack,
+  onMonsterDead,
+  player
+}) => {
+  const monster = new Monster({
     scene,
-    x,
-    y,
-    onClick,
-    onAttack,
-    onDead,
-    health,
-    monsterInfo,
-    player
-  }) {
+    x: monsterInfo.initX,
+    y: monsterInfo.initY,
+    health: monsterInfo.health,
+    onClick: onMonsterClick,
+    onAttack: onMonsterAttack,
+    onDead: onMonsterDead,
+    player,
+    monsterInfo
+  });
+  return monster;
+};
+
+class Monster extends Actor {
+  constructor({ scene, x, y, onClick, onAttack, player, monsterInfo }) {
     super({
       scene,
       x,
       y,
-      health,
-      asset: monsterInfo.asset,
-      name: monsterInfo.name,
-      onDead
+      actorInfo: monsterInfo
     });
 
     this.scene = scene;
-    this.monsterInfo = monsterInfo;
     this.onAttack = onAttack;
     this.player = player;
+    this.monsterInfo = this.actorInfo;
 
     this.setInteractive({
       hitArea: new Phaser.Geom.Rectangle(0, 0, 96, 96),

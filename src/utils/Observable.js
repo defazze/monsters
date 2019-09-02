@@ -1,15 +1,17 @@
 export const observable = target => {
-  return new Proxy(target, new proxyObject());
+  return new Proxy(target, new observableObject());
 };
 
-class proxyObject {
+export class observableObject {
   middlewares = [];
-  subscribe = () => callback => {
-    this.middlewares.push(callback);
+  subscribe = () => (callback, prop = null) => {
+    this.middlewares.push({ prop, callback });
   };
 
-  unsubscribe = () => callback => {
-    this.middlewares = this.middlewares.filter(c => c != callback);
+  unsubscribe = () => (callback, prop = null) => {
+    this.middlewares = this.middlewares.filter(
+      c => c.prop != prop || c.callback != callback
+    );
   };
 
   get(target, prop) {
@@ -25,7 +27,11 @@ class proxyObject {
 
   set(target, prop, val) {
     target[prop] = val;
-    this.middlewares.forEach(m => m({ prop, val }));
+    this.middlewares.forEach(m => {
+      if (m.prop == prop || !m.prop) {
+        m.callback({ prop, val });
+      }
+    });
     return true;
   }
 }
