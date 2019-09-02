@@ -3,23 +3,13 @@ import Phaser from "phaser";
 
 import { createMonster } from "../containers/Monster";
 import BattlefieldController from "../core/BattlefieldController";
-import Calculator from "../core/DamageCalculator";
 
-import {
-  CELL_SIZE,
-  SPAWN_DELAY,
-  MONSTER_AREA,
-  FIRST_MONSTER_LINE
-} from "../constants/common";
-import { GOLD } from "../constants/drop";
+import { CELL_SIZE } from "../constants/common";
 
 import { Player } from "../containers/Player";
 import Gold from "../containers/Gold";
-import DropController from "../core/DropController";
 import DropAnimator from "../utils/DropAnimator";
 import BoundContainer from "../containers/items/BoundContainer";
-
-import Zones from "../../data/zones.json";
 
 export default class extends Phaser.Scene {
   constructor() {
@@ -35,12 +25,7 @@ export default class extends Phaser.Scene {
   create() {
     this.monsters = [];
     this.inventory = this.gameData.inventory;
-    const { treasures, items } = this.gameData;
-    this.dropController = new DropController(treasures, items);
     this.dropAnimator = new DropAnimator(this);
-
-    this.spawnTime = 0;
-    this.spawnDelayRun = false;
 
     this.cameras.main.setBackgroundColor(0x8ee5ee);
     this.physics.world.setBounds(
@@ -83,9 +68,6 @@ export default class extends Phaser.Scene {
     this.input.keyboard.on("keydown", this.onKeyPressed);
 
     this.battlefieldController = new BattlefieldController(this, this.gameData);
-    this.сalculator = new Calculator();
-
-    this.mustSpawn = true;
 
     const player = new Player({
       scene: this,
@@ -120,6 +102,8 @@ export default class extends Phaser.Scene {
     this.events.on("shutdown", () => {
       this.inventory.removeContainer(this.fastItems);
     });
+
+    this.events.emit("onGenerateMonsters");
   }
 
   update(time, delta) {
@@ -134,19 +118,6 @@ export default class extends Phaser.Scene {
 
     if (this.monsters) {
       this.monsters.forEach(m => m.update(time, delta));
-    }
-
-    if (this.mustSpawn) {
-      if (!this.spawnDelayRun) {
-        this.spawnDelayRun = true;
-        this.spawnTime = time + SPAWN_DELAY;
-      } else {
-        if (time >= this.spawnTime) {
-          this.mustSpawn = false;
-          this.spawnDelayRun = false;
-          this.events.emit("onGenerateMonsters");
-        }
-      }
     }
 
     this.player.update(time, delta);
@@ -166,55 +137,33 @@ export default class extends Phaser.Scene {
     this.scene.start("WinScene");
   }
 
-  onMonsterDead = monster => {
-    const { monsterInfo } = monster;
-    const { lineIndex } = monsterInfo;
-    const drops = this.dropController.calculate(monsterInfo);
-    this.dropAnimator.animate(drops, monster.x, monster.y);
-    drops.forEach(d =>
-      d.code == GOLD ? this.inventory.addGold(d.count) : this.inventory.add(d)
-    );
-
-    monster.destroy();
-    this.battlefield.removeMonster(lineIndex, monsterInfo.rowIndex);
-
-    if (this.monsters.every(m => m.isDead || m.monsterInfo.isPermanent)) {
-      this.gameData.currentWave++;
-      if (this.gameData.currentWave > Zones[0].min.length) {
-        this.scene.start("WinScene");
-      } else {
-        this.mustSpawn = true;
-      }
-    } else {
-      if (this.battlefield.isEmpty(lineIndex)) {
-        if (lineIndex == FIRST_MONSTER_LINE) {
-          const monsters = this.monsters.filter(m => !m.isDead);
-          monsters.forEach(m => m.moveForward());
-
-          this.player.walk();
-          this.tweens.add({
-            targets: this.background,
-            tilePositionX: this.background.tilePositionX + CELL_SIZE,
-            ease: "Sine.easeInOut",
-            duration: 1000,
-            onComplete: () => this.player.idle()
-          });
-        } else {
-          const monsters = this.monsters.filter(
-            m =>
-              m.monsterInfo.lineIndex > lineIndex &&
-              !m.isDead &&
-              !m.monsterInfo.isPermanent
-          );
-          monsters.forEach(m => m.moveForward());
-        }
-      }
-    }
-  };
-
-  onPlayerDead = () => {
+  loose() {
     this.scene.start("GameOverScene");
-  };
+  }
+
+  walkPlayer(shift) {
+    this.player.walk();
+    this.tweens.add({
+      targets: this.background,
+      tilePositionX: this.background.tilePositionX + shift,
+      ease: "Sine.easeInOut",
+      duration: (Math.abs(shift) / CELL_SIZE / 2.5) * 1000,
+      onComplete: () => this.player.idle()
+    });
+  }
+
+  walkMonsters(monstersInfo, shift) {
+    this.monsters
+      .filter(m => monstersInfo.includes(m.monsterInfo))
+      .forEach(m => {
+        this.tweens.add({
+          targets: m,
+          x: m.x + shift,
+          ease: "Sine.easeInOut",
+          duration: (Math.abs(shift) / CELL_SIZE / 2.5) * 1000
+        });
+      });
+  }
 
   hurtPlayer() {
     this.player.hurt();
@@ -246,7 +195,6 @@ export default class extends Phaser.Scene {
         monsterInfo,
         onMonsterClick: this.onMonsterClick,
         onMonsterAttack: this.onMosterAttack,
-        onMonsterDead: this.onMonsterDead,
         player: this.player
       });
       this.add.existing(monster);
@@ -254,28 +202,6 @@ export default class extends Phaser.Scene {
     });
 
     this.monsters.push(...newMonsters);
-
-    this.monsters.forEach(m => {
-      this.tweens.add({
-        targets: m,
-        x: (m.monsterInfo.initX -= MONSTER_AREA * CELL_SIZE),
-        ease: "Sine.easeInOut",
-        duration: 2000
-      });
-    });
-
-    this.tweens.add({
-      targets: this.background,
-      tilePositionX: this.background.tilePositionX + MONSTER_AREA * CELL_SIZE,
-      ease: "Sine.easeInOut",
-      duration: 2000,
-      onComplete: () => {
-        this.player.idle();
-      }
-    });
-
-    this.player.walk();
-
     return newMonsters.map(m => m.monsterInfo);
   }
 }

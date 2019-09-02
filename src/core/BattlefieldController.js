@@ -5,6 +5,12 @@ import DropController from "../core/DropController";
 import { GOLD } from "../constants/drop";
 import Zones from "../../data/zones.json";
 
+import {
+  CELL_SIZE,
+  MONSTER_AREA,
+  FIRST_MONSTER_LINE
+} from "../constants/common";
+
 export default class {
   constructor(battlefield, gameData) {
     const { treasures, items } = gameData;
@@ -24,6 +30,8 @@ export default class {
   monsters = [];
 
   generate = () => {
+    this.monsters = this.monsters.filter(m => !m.isDead);
+
     const newMonsters = this.battlefield.addMonsters(
       this.generator.generate(this.wave)
     );
@@ -31,6 +39,10 @@ export default class {
     newMonsters.forEach(m =>
       m.subscribe(args => this.onMonsterHealthChange(m), "health")
     );
+
+    const shift = MONSTER_AREA * CELL_SIZE;
+    this.battlefield.walkMonsters(this.monsters, -shift);
+    this.battlefield.walkPlayer(shift);
 
     this.wave++;
   };
@@ -40,7 +52,11 @@ export default class {
 
     if (damage > 0) {
       playerInfo.health = Math.max(0, playerInfo.health - damage);
-      this.battlefield.hurtPlayer();
+      if (playerInfo.health == 0) {
+        this.battlefield.loose();
+      } else {
+        this.battlefield.hurtPlayer();
+      }
     }
   };
 
@@ -54,7 +70,7 @@ export default class {
 
   onMonsterHealthChange = monsterInfo => {
     if (monsterInfo.health == 0) {
-      monsterInfo.isDead = true;
+      const { lineIndex } = monsterInfo;
       this.drop(monsterInfo);
 
       if (this.monsters.every(m => m.isDead || m.isPermanent)) {
@@ -65,6 +81,17 @@ export default class {
         } else {
           this.generate();
         }
+      } else if (this.isEmpty(lineIndex)) {
+        const filter =
+          lineIndex == FIRST_MONSTER_LINE
+            ? m => !m.isDead && !m.isPermanent
+            : m => m.lineIndex > lineIndex && !m.isDead && !m.isPermanent;
+
+        if (lineIndex == FIRST_MONSTER_LINE) {
+          this.battlefield.walkPlayer(CELL_SIZE);
+        }
+
+        this.battlefield.walkMonsters(this.monsters.filter(filter), -CELL_SIZE);
       }
     }
   };
@@ -76,4 +103,8 @@ export default class {
     );
     this.battlefield.dropAnimate(drops, monsterInfo);
   };
+
+  isEmpty = lineIndex =>
+    this.monsters.filter(m => m.lineIndex == lineIndex && !m.isDead).length ==
+    0;
 }

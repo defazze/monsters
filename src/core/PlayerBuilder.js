@@ -1,9 +1,11 @@
-import Data from "../../data/player.json";
+import Player from "../../data/player.json";
 import { SUPERHERO } from "../constants/cheats";
+import { runInThisContext } from "vm";
 
 export default class {
   constructor() {
-    this.playerInfo = Data;
+    this.playerInfo = Player;
+    this.playerInfo.totalHealth = Player.health;
   }
 
   build() {

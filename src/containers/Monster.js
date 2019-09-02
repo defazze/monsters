@@ -1,14 +1,12 @@
 import Phaser from "phaser";
 import Actor from "./Actor";
 import { CELL_SIZE } from "../constants/common";
-import { proxy } from "../core/ActorInfoProxy";
 
 export const createMonster = ({
   scene,
   monsterInfo,
   onMonsterClick,
   onMonsterAttack,
-  onMonsterDead,
   player
 }) => {
   const monster = new Monster({
@@ -18,7 +16,6 @@ export const createMonster = ({
     health: monsterInfo.health,
     onClick: onMonsterClick,
     onAttack: onMonsterAttack,
-    onDead: onMonsterDead,
     player,
     monsterInfo
   });
@@ -55,6 +52,13 @@ class Monster extends Actor {
 
     this.on("pointerdown", () => onClick(this));
     this.on("destroy", this.onDestroy);
+    const callback = ({ val }) => {
+      if (val == 0) {
+        this.destroy();
+      }
+    };
+    this.actorInfo.subscribe(callback, "health");
+    this.on("destroy", () => this.actorInfo.unsubscribe(callback, "health"));
 
     scene.time.delayedCall(500, this.onTimerStart);
   }

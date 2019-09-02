@@ -99,7 +99,7 @@ export default class {
     monsters.forEach(m => {
       if (m.isChampion) {
         const championLineIndex = Math.min(
-          Math.max(...newMonsters.map(m => m.lineIndex)) + 2,
+          Math.max(...newMonsters.map(m => m.initLineIndex)) + 2,
           12
         );
         const championRowIndex = CENTER_ROW;

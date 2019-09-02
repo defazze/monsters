@@ -27,13 +27,15 @@ export default class extends Phaser.GameObjects.Container {
       color: "#0f0f0f"
     });
 
-    this.actorInfo.subscribe(({ val }) => {
+    const callback = ({ val }) => {
       if (val == 0) {
-        this.destroy();
+        this.actorInfo.isDead = true;
       } else {
         this.healthBar.setHealth(val);
       }
-    }, "health");
+    };
+    this.actorInfo.subscribe(callback, "health");
+    this.on("destroy", () => this.actorInfo.unsubscribe(callback, "health"));
 
     this.add([this.name, this.healthBar, this.sprite]);
   }
@@ -45,13 +47,13 @@ export default class extends Phaser.GameObjects.Container {
   update(time, delta) {
     const regenerateSpeed = this.regenerator.process(time);
     if (regenerateSpeed > 0) {
-      this.currentHealth += regenerateSpeed * delta;
+      let health = this.actorInfo.health + regenerateSpeed * delta;
 
-      if (this.currentHealth >= this.totalHealth) {
+      if (health >= this.totalHealth) {
         this.regenerator.reset();
-        this.currentHealth = this.totalHealth;
+        health = this.totalHealth;
       }
-      this.healthBar.setHealth(this.currentHealth);
+      this.actorInfo.health = health;
     }
   }
 }

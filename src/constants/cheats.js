@@ -1,2 +1,2 @@
-export const SUPERHERO = false;
+export const SUPERHERO = true;
 export const MANY_MONSTERS = false;
