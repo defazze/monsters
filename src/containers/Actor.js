@@ -21,18 +21,24 @@ export default class extends Phaser.GameObjects.Container {
     });
     scene.add.existing(this.healthBar);
 
-    this.name = scene.add.text(-40, -48, actorInfo.name, {
-      fontFamily: "Arial",
-      fontSize: 12,
-      color: "#0f0f0f"
-    });
+    const font = actorInfo.isChampion
+      ? {
+          fontFamily: "Arial Black",
+          fontSize: 12,
+          color: "#9d3133"
+        }
+      : {
+          fontFamily: "Arial",
+          fontSize: 12,
+          color: "#0f0f0f"
+        };
+    this.name = scene.add.text(-40, -48, actorInfo.name, font);
 
     const callback = ({ val }) => {
       if (val == 0) {
         this.actorInfo.isDead = true;
-      } else {
-        this.healthBar.setHealth(val);
       }
+      this.healthBar.setHealth(val);
     };
     this.actorInfo.subscribe(callback, "health");
     this.on("destroy", () => this.actorInfo.unsubscribe(callback, "health"));

@@ -8,6 +8,7 @@ import CastleScene from "./scenes/Castle";
 import InventoryScene from "./scenes/Inventory";
 import WinScene from "./scenes/Win";
 import TradeScene from "./scenes/Trade";
+import TransitionScene from "./scenes/Transition";
 
 import config from "./config";
 
@@ -20,7 +21,8 @@ const gameConfig = Object.assign(config, {
     CastleScene,
     InventoryScene,
     WinScene,
-    TradeScene
+    TradeScene,
+    TransitionScene
   ]
 });
 
