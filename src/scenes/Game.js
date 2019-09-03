@@ -154,7 +154,7 @@ export default class extends Phaser.Scene {
     this.tweens.add({
       targets: this.background,
       tilePositionX: this.background.tilePositionX + shift,
-      ease: "Sine.easeInOut",
+      //ease: "Sine.easeInOut",
       duration: (Math.abs(shift) / CELL_SIZE / 2.5) * 1000,
       onComplete: () => this.player.idle()
     });
@@ -164,12 +164,14 @@ export default class extends Phaser.Scene {
     this.objects
       .filter(m => objectsInfo.includes(m.monsterInfo))
       .forEach(m => {
+        m.body.setVelocityX(-(CELL_SIZE * 2.5));
+        /*
         this.tweens.add({
           targets: m,
           x: m.x + shift,
           ease: "Sine.easeInOut",
           duration: (Math.abs(shift) / CELL_SIZE / 2.5) * 1000
-        });
+        });*/
       });
   }
 
@@ -209,14 +211,15 @@ export default class extends Phaser.Scene {
       if (monsterInfo.isLandscape) {
         monster.body.setImmovable();
       }
-      this.physics.add.collider(monster.sprite, this.player.sprite);
+      this.physics.add.collider(monster, this.player);
+      /*
       this.physics.add.overlap(
         this.player,
         monster,
         () => console.log("Overlap!!!"),
         null,
         this
-      );
+      );*/
       return monster;
     });
 
