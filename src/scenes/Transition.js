@@ -7,8 +7,10 @@ export default class extends Phaser.Scene {
   init() {}
   preload() {}
 
-  create() {
+  create(data) {
     this.cameras.main.setBackgroundColor("rgba(0,0,0,0)");
+    const knight = this.add.image(data.x, data.y, "knight-dead");
+    knight.setAlpha(0);
 
     this.tweens.addCounter({
       duration: 5000,
@@ -16,10 +18,17 @@ export default class extends Phaser.Scene {
         this.cameras.main.setBackgroundColor(
           "rgba(0,0,0," + target.value + ")"
         );
+        knight.setAlpha(target.value);
       },
       onComplete: () => {
         this.scene.stop("GameScene");
-        this.scene.start("CastleScene");
+        this.tweens.add({
+          targets: knight,
+          y: 0,
+          alpha: 0,
+          duration: 3000,
+          onComplete: () => this.scene.start("CastleScene")
+        });
       }
     });
   }

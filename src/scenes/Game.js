@@ -138,16 +138,11 @@ export default class extends Phaser.Scene {
   }
 
   loose() {
-    //this.scene.start("GameOverScene");
     this.scene.pause("GameScene");
-    this.scene.launch("TransitionScene");
-    /*
-    this.add.tween({
-      targets: this,
-      ease: "Sine.easeInOut",
-      duration: 1000,
-      alpha: 0
-    });*/
+    this.scene.launch("TransitionScene", {
+      x: this.player.x + this.player.sprite.x,
+      y: this.player.y + this.player.sprite.y
+    });
   }
 
   walkPlayer(shift) {
