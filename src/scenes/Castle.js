@@ -4,12 +4,10 @@ export default class extends Phaser.Scene {
   constructor() {
     super({ key: "CastleScene" });
   }
-  init(data) {
-    this.customData = data;
-  }
+  init() {}
   preload() {}
 
-  create() {
+  create(gameData) {
     this.cameras.main.setBackgroundColor(0x34c70e);
 
     const battlefield = this.add
@@ -18,9 +16,7 @@ export default class extends Phaser.Scene {
     battlefield.on("pointerdown", () => this.scene.switch("GameScene"));
 
     const store = this.add.sprite(229, 50, "store").setInteractive();
-    store.on("pointerdown", () =>
-      this.scene.start("TradeScene", this.customData)
-    );
+    store.on("pointerdown", () => this.scene.start("TradeScene", gameData));
 
     this.add.sprite(528, 432, "castle-big");
   }

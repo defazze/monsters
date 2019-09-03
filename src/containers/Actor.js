@@ -8,6 +8,9 @@ export default class extends Phaser.GameObjects.Container {
     super(scene, x, y);
 
     this.setSize(96, 96);
+    if (!actorInfo.totalHealth) {
+      actorInfo.totalHealth = actorInfo.health;
+    }
     this.actorInfo = proxy(actorInfo, this);
 
     this.regenerator = new Regenerator();
@@ -17,9 +20,10 @@ export default class extends Phaser.GameObjects.Container {
       scene,
       x: 0,
       y: -28,
-      health: actorInfo.health
+      health: actorInfo.totalHealth
     });
     scene.add.existing(this.healthBar);
+    this.healthBar.setHealth(this.actorInfo.health);
 
     const font = actorInfo.isChampion
       ? {

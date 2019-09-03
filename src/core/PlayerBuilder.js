@@ -5,7 +5,6 @@ import { runInThisContext } from "vm";
 export default class {
   constructor() {
     this.playerInfo = Player;
-    this.playerInfo.totalHealth = Player.health;
   }
 
   build() {

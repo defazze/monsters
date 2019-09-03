@@ -7,9 +7,13 @@ export default class extends Phaser.Scene {
   init() {}
   preload() {}
 
-  create(data) {
+  create(gameData) {
+    gameData.playerInfo.health = gameData.playerInfo.totalHealth;
+    gameData.currentWave = 1;
+
+    const { x, y } = gameData.knight;
     this.cameras.main.setBackgroundColor("rgba(0,0,0,0)");
-    const knight = this.add.image(data.x, data.y, "knight-dead");
+    const knight = this.add.image(x, y, "knight-dead");
     knight.setAlpha(0);
 
     this.tweens.addCounter({
@@ -27,7 +31,7 @@ export default class extends Phaser.Scene {
           y: 0,
           alpha: 0,
           duration: 3000,
-          onComplete: () => this.scene.start("CastleScene")
+          onComplete: () => this.scene.start("CastleScene", gameData)
         });
       }
     });

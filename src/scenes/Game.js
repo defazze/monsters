@@ -16,8 +16,8 @@ export default class extends Phaser.Scene {
     super({ key: "GameScene" });
   }
 
-  init(data) {
-    this.gameData = data;
+  init(gameData) {
+    this.gameData = gameData;
   }
 
   preload() {}
@@ -101,6 +101,9 @@ export default class extends Phaser.Scene {
     this.inventory.addContainer(this.fastItems);
     this.events.on("shutdown", () => {
       this.inventory.removeContainer(this.fastItems);
+      this.events.off("onGenerateMonsters");
+      this.events.off("onMonsterAttack");
+      this.events.off("onPlayerAttack");
     });
 
     this.events.emit("onGenerateMonsters");
@@ -138,11 +141,12 @@ export default class extends Phaser.Scene {
   }
 
   loose() {
-    this.scene.pause("GameScene");
-    this.scene.launch("TransitionScene", {
+    this.gameData.knight = {
       x: this.player.x + this.player.sprite.x,
       y: this.player.y + this.player.sprite.y
-    });
+    };
+    this.scene.pause("GameScene");
+    this.scene.launch("TransitionScene", this.gameData);
   }
 
   walkPlayer(shift) {

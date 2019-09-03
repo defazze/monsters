@@ -13,6 +13,7 @@ import {
 
 export default class {
   constructor(battlefield, gameData) {
+    this.gameData = gameData;
     const { treasures, items } = gameData;
     this.dropController = new DropController(treasures, items);
 
@@ -26,14 +27,13 @@ export default class {
 
   generator = new Generator();
   calculator = new Calculator();
-  wave = 7;
   monsters = [];
 
   generate = () => {
     this.monsters = this.monsters.filter(m => !m.isDead);
 
     const newMonsters = this.battlefield.addMonsters(
-      this.generator.generate(this.wave)
+      this.generator.generate(this.gameData.currentWave)
     );
     this.monsters.push(...newMonsters);
     newMonsters.forEach(m =>
@@ -43,8 +43,6 @@ export default class {
     const shift = MONSTER_AREA * CELL_SIZE;
     this.battlefield.walkMonsters(this.monsters, -shift);
     this.battlefield.walkPlayer(shift);
-
-    this.wave++;
   };
 
   onMonsterAttack = (monsterInfo, playerInfo) => {
@@ -76,7 +74,8 @@ export default class {
       if (this.monsters.every(m => m.isDead || m.isPermanent)) {
         this.monsters = this.monsters.filter(m => !m.isDead);
 
-        if (this.wave >= Zones[0].min.length) {
+        this.gameData.currentWave++;
+        if (this.gameData.currentWave >= Zones[0].min.length) {
           this.battlefield.win();
         } else {
           this.generate();
