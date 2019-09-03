@@ -23,7 +23,7 @@ export default class extends Phaser.Scene {
   preload() {}
 
   create() {
-    this.monsters = [];
+    this.objects = [];
     this.inventory = this.gameData.inventory;
     this.dropAnimator = new DropAnimator(this);
 
@@ -119,8 +119,8 @@ export default class extends Phaser.Scene {
       body.setVelocityY(0);
     }
 
-    if (this.monsters) {
-      this.monsters.forEach(m => m.update(time, delta));
+    if (this.objects) {
+      this.objects.forEach(m => m.update(time, delta));
     }
 
     this.player.update(time, delta);
@@ -149,7 +149,7 @@ export default class extends Phaser.Scene {
     this.scene.launch("TransitionScene", this.gameData);
   }
 
-  walkPlayer(shift) {
+  movePlayer(shift) {
     this.player.walk();
     this.tweens.add({
       targets: this.background,
@@ -160,9 +160,9 @@ export default class extends Phaser.Scene {
     });
   }
 
-  walkMonsters(monstersInfo, shift) {
-    this.monsters
-      .filter(m => monstersInfo.includes(m.monsterInfo))
+  moveObjects(objectsInfo, shift) {
+    this.objects
+      .filter(m => objectsInfo.includes(m.monsterInfo))
       .forEach(m => {
         this.tweens.add({
           targets: m,
@@ -194,10 +194,8 @@ export default class extends Phaser.Scene {
     this.fastItems.keyPress(event.key);
   };
 
-  addMonsters(monstersInfo) {
-    this.monsters = this.monsters.filter(m => !m.isDead);
-
-    const newMonsters = monstersInfo.map(monsterInfo => {
+  addObjects(objectsInfo) {
+    const newObjects = objectsInfo.map(monsterInfo => {
       const monster = createMonster({
         scene: this,
         monsterInfo,
@@ -209,7 +207,7 @@ export default class extends Phaser.Scene {
       return monster;
     });
 
-    this.monsters.push(...newMonsters);
-    return newMonsters.map(m => m.monsterInfo);
+    this.objects.push(...newObjects);
+    return newObjects.map(m => m.monsterInfo);
   }
 }

@@ -27,22 +27,22 @@ export default class {
 
   generator = new Generator();
   calculator = new Calculator();
-  monsters = [];
+  objects = [];
 
   generate = () => {
-    this.monsters = this.monsters.filter(m => !m.isDead);
+    this.objects = this.objects.filter(m => !m.isDead);
 
-    const newMonsters = this.battlefield.addMonsters(
+    const newObjects = this.battlefield.addObjects(
       this.generator.generate(this.gameData.currentWave)
     );
-    this.monsters.push(...newMonsters);
-    newMonsters.forEach(m =>
+    this.objects.push(...newObjects);
+    newObjects.forEach(m =>
       m.subscribe(args => this.onMonsterHealthChange(m), "health")
     );
 
     const shift = MONSTER_AREA * CELL_SIZE;
-    this.battlefield.walkMonsters(this.monsters, -shift);
-    this.battlefield.walkPlayer(shift);
+    this.battlefield.moveObjects(this.objects, -shift);
+    this.battlefield.movePlayer(shift);
   };
 
   onMonsterAttack = (monsterInfo, playerInfo) => {
@@ -71,8 +71,8 @@ export default class {
       const { lineIndex } = monsterInfo;
       this.drop(monsterInfo);
 
-      if (this.monsters.every(m => m.isDead || m.isPermanent)) {
-        this.monsters = this.monsters.filter(m => !m.isDead);
+      if (this.objects.every(m => m.isDead || m.isPermanent)) {
+        this.objects = this.objects.filter(m => !m.isDead);
 
         this.gameData.currentWave++;
         if (this.gameData.currentWave >= Zones[0].min.length) {
@@ -83,14 +83,14 @@ export default class {
       } else if (this.isEmpty(lineIndex)) {
         const filter =
           lineIndex == FIRST_MONSTER_LINE
-            ? m => !m.isDead && !m.isPermanent
+            ? m => !m.isDead
             : m => m.lineIndex > lineIndex && !m.isDead && !m.isPermanent;
 
         if (lineIndex == FIRST_MONSTER_LINE) {
-          this.battlefield.walkPlayer(CELL_SIZE);
+          this.battlefield.movePlayer(CELL_SIZE);
         }
 
-        this.battlefield.walkMonsters(this.monsters.filter(filter), -CELL_SIZE);
+        this.battlefield.moveObjects(this.objects.filter(filter), -CELL_SIZE);
       }
     }
   };
@@ -104,6 +104,7 @@ export default class {
   };
 
   isEmpty = lineIndex =>
-    this.monsters.filter(m => m.lineIndex == lineIndex && !m.isDead).length ==
-    0;
+    this.objects.filter(
+      m => m.lineIndex == lineIndex && !m.isDead && !m.isLandscape
+    ).length == 0;
 }

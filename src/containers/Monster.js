@@ -13,7 +13,6 @@ export const createMonster = ({
     scene,
     x: monsterInfo.initX,
     y: monsterInfo.initY,
-    health: monsterInfo.health,
     onClick: onMonsterClick,
     onAttack: onMonsterAttack,
     player,

@@ -12,24 +12,26 @@ import {
 
 const LINES = [9, 10, 11, 12];
 const ROWS = [0, 1, 2, 3, 4, 5, 6];
+const TUTORIAL_ZONE = Zones[0];
 
 export default class {
   generate(wave) {
+    console.log("wave", wave, "=====================================");
     const enabledMonsters = Monsters.filter(
       m => m.minWave <= wave && m.maxWave >= wave
     );
 
     const commonMonsters = enabledMonsters.filter(m => !m.isUnique);
 
-    const minCount = Zones[0].min[wave - 1];
-    const maxCount = Zones[0].max[wave - 1];
-    const count = Phaser.Math.RND.between(minCount, maxCount);
+    const minMonsters = TUTORIAL_ZONE.min[wave - 1];
+    const maxMonsters = TUTORIAL_ZONE.max[wave - 1];
+    const monstersCount = Phaser.Math.RND.between(minMonsters, maxMonsters);
 
     const getMonster = () => {
       return { ...Phaser.Utils.Array.GetRandom(commonMonsters) };
     };
 
-    let generatedMonsters = range(count).map(a => getMonster());
+    let battleObjects = range(monstersCount).map(a => getMonster());
 
     if (wave == 7) {
       const champion = getMonster();
@@ -48,8 +50,8 @@ export default class {
       champion.treasure += " C";
       champion.isChampion = true;
 
-      generatedMonsters.push(champion);
-      generatedMonsters.push(...champion.minions);
+      battleObjects.push(champion);
+      battleObjects.push(...champion.minions);
     }
 
     const uniqueMonsters = enabledMonsters.filter(m => m.isUnique);
@@ -57,29 +59,39 @@ export default class {
     uniqueMonsters.forEach(monsterInfo => {
       const spawnChance = Phaser.Math.RND.between(1, 100);
       if (monsterInfo.spawnRate > spawnChance) {
-        generatedMonsters.push({ ...monsterInfo });
+        battleObjects.push({ ...monsterInfo });
       }
     });
 
-    generatedMonsters.forEach(m => {
+    battleObjects.forEach(m => {
       m.priorityLines = m.priorityLines || [4, 5, 6, 7];
       const health = Phaser.Math.RND.between(m.minHealth, m.maxHealth);
       m.health = health;
     });
 
-    generatedMonsters = generatedMonsters.sort(
+    battleObjects = battleObjects.sort(
       (a, b) => a.priorityLines[0] - b.priorityLines[0]
     );
 
-    const newMonsters = this.addMonsters(generatedMonsters);
-    return newMonsters;
+    const { landscape } = TUTORIAL_ZONE;
+
+    landscape.forEach(landscapeObject => {
+      const { minCount, maxCount, asset } = landscapeObject;
+      const objectsCount = Phaser.Math.RND.between(minCount, maxCount);
+      range(objectsCount).forEach(o =>
+        battleObjects.push({ asset, isLandscape: true, isPermanent: true })
+      );
+    });
+
+    const newObjects = this.addObjects(battleObjects);
+    return newObjects;
   }
 
-  addMonsters(monsters) {
-    let newMonsters = [];
+  addObjects(battleObjbects) {
+    let newObjects = [];
 
     const push = (monster, lineIndex, rowIndex) => {
-      newMonsters = newMonsters.filter(
+      newObjects = newObjects.filter(
         m => m.initLineIndex != lineIndex || m.initRowIndex != rowIndex
       );
 
@@ -88,18 +100,28 @@ export default class {
       monster.initX = (lineIndex + 1.5) * CELL_SIZE;
       monster.initY = (rowIndex + 1.5) * CELL_SIZE;
 
-      newMonsters.push(monster);
+      newObjects.push(monster);
     };
 
-    const getMonstersCount = lineIndex =>
-      newMonsters.filter(m => m.initLineIndex == lineIndex).length;
+    const getObjectsCount = lineIndex =>
+      newObjects.filter(m => m.initLineIndex == lineIndex).length;
 
-    const isEmpty = lineIndex => getMonstersCount(lineIndex) == 0;
+    const isEmpty = lineIndex => getObjectsCount(lineIndex) == 0;
+
+    const monsters = battleObjbects.filter(o => !o.isLandscape);
+    const landscape = battleObjbects.filter(o => o.isLandscape);
+
+    const landscapePlaces = this.getRandomPlaces(landscape.length);
+    landscape.forEach(o => {
+      const { lineIndex, rowIndex } = landscapePlaces[landscape.indexOf(o)];
+      push(o, lineIndex, rowIndex);
+      console.log("stone", lineIndex, rowIndex);
+    });
 
     monsters.forEach(m => {
       if (m.isChampion) {
         const championLineIndex = Math.min(
-          Math.max(...newMonsters.map(m => m.initLineIndex)) + 2,
+          Math.max(...newObjects.map(m => m.initLineIndex)) + 2,
           12
         );
         const championRowIndex = CENTER_ROW;
@@ -113,11 +135,11 @@ export default class {
         });
       } else if (!m.champion) {
         const enableLines = LINES.filter(i => {
-          const count = getMonstersCount(i);
+          const count = getObjectsCount(i);
           return count > 0 && count < 7;
         });
 
-        const firstEmpty = LINES.find(i => getMonstersCount(i) == 0);
+        const firstEmpty = LINES.find(i => getObjectsCount(i) == 0);
         if (firstEmpty) {
           enableLines.push(firstEmpty);
         }
@@ -139,18 +161,19 @@ export default class {
             : Phaser.Utils.Array.GetRandom(
                 ROWS.filter(
                   a =>
-                    !newMonsters
-                      .filter(m => m.lineIndex == monsterLineIndex)
-                      .map(m => m.rowIndex)
+                    !newObjects
+                      .filter(m => m.initLineIndex == monsterLineIndex)
+                      .map(m => m.initRowIndex)
                       .includes(a)
                 )
               );
 
         push(m, monsterLineIndex, monsterRowIndex);
+        console.log("Monster", monsterLineIndex, monsterRowIndex);
       }
     });
 
-    return newMonsters;
+    return newObjects;
   }
 
   getLineByPriority(priorityLines) {
@@ -165,5 +188,21 @@ export default class {
         return priorityLines[i];
       }
     }
+  }
+
+  getRandomPlaces(placesCount) {
+    const totalPlacesCount = LINES.length * ROWS.length;
+    const places = Phaser.Utils.Array.Shuffle(range(totalPlacesCount)).slice(
+      0,
+      placesCount
+    );
+
+    return places.map(p => {
+      const lineIndex = (p % LINES.length) + 9;
+      const rowIndex = Math.floor(p / LINES.length);
+
+      console.log("place", p, lineIndex, rowIndex);
+      return { lineIndex, rowIndex };
+    });
   }
 }

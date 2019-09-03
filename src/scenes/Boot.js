@@ -33,6 +33,7 @@ export default class extends Phaser.Scene {
     this.load.image("inventory-icon", "assets/images/inventory-icon.png");
     this.load.image("grass", "assets/images/grass2.png");
     this.load.image("store", "assets/images/store.png");
+    this.load.image("stone", "assets/images/stone.png");
     this.load.image("coins", "assets/images/coins.png");
     this.load.image("knight-dead", "assets/images/knight_dead.png");
     this.load.spritesheet("coin", "assets/images/coin2.png", {

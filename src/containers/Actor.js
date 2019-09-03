@@ -2,12 +2,13 @@ import Phaser from "phaser";
 import HealthBar from "../containers/HealthBar";
 import Regenerator from "../core/Regenerator";
 import { proxy } from "../core/ActorInfoProxy";
+import { CELL_SIZE } from "../constants/common";
 
 export default class extends Phaser.GameObjects.Container {
   constructor({ scene, x, y, actorInfo }) {
     super(scene, x, y);
 
-    this.setSize(96, 96);
+    this.setSize(CELL_SIZE, CELL_SIZE);
     if (!actorInfo.totalHealth) {
       actorInfo.totalHealth = actorInfo.health;
     }
@@ -15,39 +16,45 @@ export default class extends Phaser.GameObjects.Container {
 
     this.regenerator = new Regenerator();
 
-    this.sprite = scene.physics.add.sprite(0, 16, actorInfo.asset);
-    this.healthBar = new HealthBar({
-      scene,
-      x: 0,
-      y: -28,
-      health: actorInfo.totalHealth
-    });
-    scene.add.existing(this.healthBar);
-    this.healthBar.setHealth(this.actorInfo.health);
+    const spriteY = actorInfo.isLandscape ? 0 : 16;
+    this.sprite = scene.physics.add.sprite(0, spriteY, actorInfo.asset);
 
-    const font = actorInfo.isChampion
-      ? {
-          fontFamily: "Arial Black",
-          fontSize: 12,
-          color: "#9d3133"
+    if (actorInfo.isLandscape) {
+      this.add([this.sprite]);
+    } else {
+      this.healthBar = new HealthBar({
+        scene,
+        x: 0,
+        y: -28,
+        health: actorInfo.totalHealth
+      });
+      scene.add.existing(this.healthBar);
+      this.healthBar.setHealth(this.actorInfo.health);
+
+      const font = actorInfo.isChampion
+        ? {
+            fontFamily: "Arial Black",
+            fontSize: 12,
+            color: "#9d3133"
+          }
+        : {
+            fontFamily: "Arial",
+            fontSize: 12,
+            color: "#0f0f0f"
+          };
+      this.name = scene.add.text(-40, -48, actorInfo.name, font);
+
+      const callback = ({ val }) => {
+        if (val == 0) {
+          this.actorInfo.isDead = true;
         }
-      : {
-          fontFamily: "Arial",
-          fontSize: 12,
-          color: "#0f0f0f"
-        };
-    this.name = scene.add.text(-40, -48, actorInfo.name, font);
+        this.healthBar.setHealth(val);
+      };
+      this.actorInfo.subscribe(callback, "health");
+      this.on("destroy", () => this.actorInfo.unsubscribe(callback, "health"));
 
-    const callback = ({ val }) => {
-      if (val == 0) {
-        this.actorInfo.isDead = true;
-      }
-      this.healthBar.setHealth(val);
-    };
-    this.actorInfo.subscribe(callback, "health");
-    this.on("destroy", () => this.actorInfo.unsubscribe(callback, "health"));
-
-    this.add([this.name, this.healthBar, this.sprite]);
+      this.add([this.name, this.healthBar, this.sprite]);
+    }
   }
 
   regenerate(health, interval) {
