@@ -16,7 +16,6 @@ const TUTORIAL_ZONE = Zones[0];
 
 export default class {
   generate(wave) {
-    console.log("wave", wave, "=====================================");
     const enabledMonsters = Monsters.filter(
       m => m.minWave <= wave && m.maxWave >= wave
     );
@@ -115,7 +114,6 @@ export default class {
     landscape.forEach(o => {
       const { lineIndex, rowIndex } = landscapePlaces[landscape.indexOf(o)];
       push(o, lineIndex, rowIndex);
-      console.log("stone", lineIndex, rowIndex);
     });
 
     monsters.forEach(m => {
@@ -169,7 +167,6 @@ export default class {
               );
 
         push(m, monsterLineIndex, monsterRowIndex);
-        console.log("Monster", monsterLineIndex, monsterRowIndex);
       }
     });
 
@@ -201,7 +198,6 @@ export default class {
       const lineIndex = (p % LINES.length) + 9;
       const rowIndex = Math.floor(p / LINES.length);
 
-      console.log("place", p, lineIndex, rowIndex);
       return { lineIndex, rowIndex };
     });
   }

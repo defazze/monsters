@@ -203,7 +203,20 @@ export default class extends Phaser.Scene {
         onMonsterAttack: this.onMosterAttack,
         player: this.player
       });
+
       this.add.existing(monster);
+      this.physics.world.enable(monster);
+      if (monsterInfo.isLandscape) {
+        monster.body.setImmovable();
+      }
+      this.physics.add.collider(monster.sprite, this.player.sprite);
+      this.physics.add.overlap(
+        this.player,
+        monster,
+        () => console.log("Overlap!!!"),
+        null,
+        this
+      );
       return monster;
     });
 
