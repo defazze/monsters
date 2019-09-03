@@ -15,5 +15,12 @@
     "name": "potion0",
     "drops": ["hpPotion0", "manaPotion0"],
     "probs": [8, 2]
+  },
+  {
+    "name": "tutorial C",
+    "picks": 4,
+    "drops": ["noDrop", "gold", "potion0"],
+    "probs": [25, 30, 15],
+    "goldRate": 3
   }
 ]

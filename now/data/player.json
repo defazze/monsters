@@ -1,4 +1,6 @@
 {
+  "asset": "knight",
+  "name": "Knight",
   "strength": 30,
   "dexterity": 20,
   "vitality": 25,

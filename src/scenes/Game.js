@@ -102,8 +102,8 @@ export default class extends Phaser.Scene {
     this.events.on("shutdown", () => {
       this.inventory.removeContainer(this.fastItems);
       this.events.off("onGenerateMonsters");
-      this.events.off("onMonsterAttack");
       this.events.off("onPlayerAttack");
+      this.events.off("onMonsterAttack");
     });
 
     this.events.emit("onGenerateMonsters");
